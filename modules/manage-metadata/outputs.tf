@@ -17,20 +17,20 @@ output "aspect_types" {
     data_quality      = google_dataplex_aspect_type.data_quality
     business_metadata = google_dataplex_aspect_type.business_metadata
     lineage           = google_dataplex_aspect_type.lineage
-    glossary_term     = try(google_dataplex_aspect_type.glossary_term[0], null)
+    glossary_term     = var.enable_glossaries ? google_dataplex_aspect_type.glossary_term : null
   }
 }
 
 output "glossary_dataset" {
   description = "BigQuery dataset for glossaries"
-  value       = try(google_bigquery_dataset.glossary[0], null)
+  value       = var.enable_glossaries ? google_bigquery_dataset.glossary : null
 }
 
 output "glossary_tables" {
   description = "BigQuery tables for glossary data"
-  value = {
-    terms         = try(google_bigquery_table.glossary_terms[0], null)
-    glossaries    = try(google_bigquery_table.glossaries[0], null)
-    relationships = try(google_bigquery_table.term_relationships[0], null)
-  }
+  value = var.enable_glossaries ? {
+    terms         = google_bigquery_table.glossary_terms
+    glossaries    = google_bigquery_table.glossaries
+    relationships = google_bigquery_table.term_relationships
+  } : {}
 }

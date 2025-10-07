@@ -11,15 +11,6 @@
 
 # Quality Service - Data Quality Checks and Rules
 
-# Data source to get existing lakes
-data "google_dataplex_lake" "lakes" {
-  for_each = toset([for scan in var.quality_scans : scan.lake_id])
-
-  lake     = each.value
-  location = var.location
-  project  = var.project_id
-}
-
 # Create Data Quality Scans
 resource "google_dataplex_datascan" "quality_scans" {
   for_each = { for scan in var.quality_scans : scan.scan_id => scan }
@@ -123,7 +114,6 @@ resource "google_dataplex_datascan" "quality_scans" {
     }
   )
 
-  depends_on = [data.google_dataplex_lake.lakes]
 }
 
 # Create BigQuery dataset for quality results
@@ -378,15 +368,6 @@ resource "google_bigquery_table" "failed_rules_view" {
 }
 # Profiling Service - Data Profiling and Discovery
 
-# Data source to get existing lakes
-data "google_dataplex_lake" "lakes" {
-  for_each = toset([for scan in var.profiling_scans : scan.lake_id])
-
-  lake     = each.value
-  location = var.location
-  project  = var.project_id
-}
-
 # Create Data Profiling Scans using Dataplex Data Scan API
 resource "google_dataplex_datascan" "profiling_scans" {
   for_each = { for scan in var.profiling_scans : scan.scan_id => scan }
@@ -424,7 +405,6 @@ resource "google_dataplex_datascan" "profiling_scans" {
     }
   )
 
-  depends_on = [data.google_dataplex_lake.lakes]
 }
 
 # Create BigQuery dataset for profiling results

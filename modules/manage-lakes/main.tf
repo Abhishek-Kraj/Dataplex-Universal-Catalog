@@ -13,7 +13,7 @@
 resource "google_dataplex_lake" "lakes" {
   for_each = var.enable_manage ? { for lake in var.lakes : lake.lake_id => lake } : {}
 
-  lake_id      = each.value.lake_id
+  name         = each.value.lake_id
   location     = var.location
   project      = var.project_id
   display_name = coalesce(each.value.display_name, each.value.lake_id)
@@ -54,7 +54,7 @@ resource "google_dataplex_zone" "zones" {
 
   lake         = google_dataplex_lake.lakes[each.value.lake_id].id
   location     = var.location
-  zone_id      = each.value.zone_id
+  name         = each.value.zone_id
   type         = each.value.type
   display_name = coalesce(each.value.display_name, each.value.zone_id)
   description  = coalesce(each.value.description, "${each.value.type} zone: ${each.value.zone_id}")
@@ -142,7 +142,7 @@ resource "google_bigquery_dataset" "curated_zone_dataset" {
 resource "google_dataplex_asset" "raw_assets" {
   for_each = google_storage_bucket.raw_zone_bucket
 
-  asset_id      = "${each.value.name}-asset"
+  name          = "${each.value.name}-asset"
   lake          = google_dataplex_lake.lakes[local.zones_map[each.key].lake_id].id
   location      = var.location
   dataplex_zone = google_dataplex_zone.zones[each.key].id
@@ -172,7 +172,7 @@ resource "google_dataplex_asset" "raw_assets" {
 resource "google_dataplex_asset" "curated_assets" {
   for_each = google_bigquery_dataset.curated_zone_dataset
 
-  asset_id      = "${each.value.dataset_id}-asset"
+  name          = "${each.value.dataset_id}-asset"
   lake          = google_dataplex_lake.lakes[local.zones_map[each.key].lake_id].id
   location      = var.location
   dataplex_zone = google_dataplex_zone.zones[each.key].id
