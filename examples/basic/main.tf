@@ -8,11 +8,16 @@ module "dataplex" {
 
   enable_manage_lakes = true
   enable_metadata     = true
-  enable_governance   = false
+  enable_governance   = true
 
   # Metadata settings
   enable_catalog    = true
   enable_glossaries = true
+
+  # Governance settings
+  enable_quality    = true
+  enable_profiling  = true
+  enable_monitoring = false
 
   lakes = [
     {
@@ -126,6 +131,42 @@ module "dataplex" {
           description  = "The amount the policyholder must pay out-of-pocket before insurance coverage begins"
         }
       ]
+    }
+  ]
+
+  # Data Quality Scans
+  quality_scans = [
+    {
+      scan_id      = "claims-data-quality"
+      lake_id      = "existing-insurance-lake"
+      display_name = "Claims Data Quality Scan"
+      description  = "Data quality checks for claims master table"
+      data_source  = "//bigquery.googleapis.com/projects/${var.project_id}/datasets/acrwe_claims_analytics/tables/claims_master"
+      rules = [
+        {
+          rule_type  = "NON_NULL"
+          column     = "claim_id"
+          threshold  = 1.0
+          dimension  = "COMPLETENESS"
+        },
+        {
+          rule_type  = "UNIQUENESS"
+          column     = "claim_id"
+          threshold  = 1.0
+          dimension  = "UNIQUENESS"
+        }
+      ]
+    }
+  ]
+
+  # Data Profiling Scans
+  profiling_scans = [
+    {
+      scan_id      = "claims-data-profile"
+      lake_id      = "existing-insurance-lake"
+      display_name = "Claims Data Profile"
+      description  = "Statistical profiling of claims master table"
+      data_source  = "//bigquery.googleapis.com/projects/${var.project_id}/datasets/acrwe_claims_analytics/tables/claims_master"
     }
   ]
 }

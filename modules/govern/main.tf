@@ -86,23 +86,6 @@ resource "google_dataplex_datascan" "quality_scans" {
         threshold = rules.value.threshold
       }
     }
-
-    # Default completeness rules
-    rules {
-      dimension = "COMPLETENESS"
-      non_null_expectation {}
-      threshold = 0.95
-    }
-
-    rules {
-      dimension = "VALIDITY"
-      threshold = 0.90
-    }
-
-    rules {
-      dimension = "CONSISTENCY"
-      threshold = 0.95
-    }
   }
 
   labels = merge(
