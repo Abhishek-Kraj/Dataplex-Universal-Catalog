@@ -1,19 +1,34 @@
-# Basic Example - Direct Module Usage
-# This example shows how to use individual Dataplex modules directly
+# Basic Example - Using Root Module
+# This example shows how to use the unified Dataplex module
 
 # =============================================================================
-# MANAGE LAKES MODULE
+# UNIFIED DATAPLEX MODULE
 # =============================================================================
-module "manage_lakes" {
-  source = "../../modules/manage-lakes"
+module "dataplex" {
+  source = "../.."
 
   project_id = var.project_id
   region     = var.region
   location   = var.location
 
+  # Enable or disable features
+  enable_manage_lakes = true
+  enable_metadata     = true
+  enable_governance   = true
+
+  # Lake management settings
   enable_manage  = true
   enable_secure  = true
-  enable_process = true
+  enable_process = false # Disable Spark jobs for basic example
+
+  # Metadata settings
+  enable_catalog     = true
+  enable_glossaries  = false # Disable glossaries for basic example
+
+  # Governance settings
+  enable_profiling  = true
+  enable_quality    = true
+  enable_monitoring = false # Disable monitoring for basic example
 
   # Define a simple lake with bronze and silver zones
   lakes = [
@@ -52,25 +67,6 @@ module "manage_lakes" {
     }
   ]
 
-  labels = {
-    environment = "development"
-    managed_by  = "terraform"
-  }
-}
-
-# =============================================================================
-# MANAGE METADATA MODULE
-# =============================================================================
-module "manage_metadata" {
-  source = "../../modules/manage-metadata"
-
-  project_id = var.project_id
-  region     = var.region
-  location   = var.location
-
-  enable_catalog    = true
-  enable_glossaries = false
-
   # Basic entry groups
   entry_groups = [
     {
@@ -84,26 +80,6 @@ module "manage_metadata" {
       description    = "Product catalog"
     }
   ]
-
-  labels = {
-    environment = "development"
-    managed_by  = "terraform"
-  }
-}
-
-# =============================================================================
-# GOVERN MODULE
-# =============================================================================
-module "govern" {
-  source = "../../modules/govern"
-
-  project_id = var.project_id
-  region     = var.region
-  location   = var.location
-
-  enable_profiling  = true
-  enable_quality    = true
-  enable_monitoring = true
 
   # Basic quality scan
   quality_scans = [
@@ -146,6 +122,4 @@ module "govern" {
     environment = "development"
     managed_by  = "terraform"
   }
-
-  depends_on = [module.manage_lakes]
 }

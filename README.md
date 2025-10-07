@@ -1,285 +1,262 @@
-# Dataplex Universal Catalog - Terraform Modules
+# terraform-google-dataplex
 
-**Production-ready, variable-driven Terraform modules for Google Cloud Dataplex Universal Catalog.**
+This module makes it easy to create and manage Google Cloud Dataplex resources including lakes, zones, assets, metadata catalog, and data governance.
 
-This repository provides standalone, self-contained modules for managing Dataplex resources. Each module can be used independently by anyone in your organization.
+The resources/services/activations that this module will create are:
 
-## 🏗️ Module Structure
+- Dataplex lakes and zones (RAW and CURATED)
+- Dataplex assets (BigQuery datasets and Cloud Storage buckets)
+- Dataplex tasks (Spark jobs, notebooks)
+- Dataplex datascans (data quality and profiling)
+- Dataplex catalog resources (entry groups, entry types, aspect types)
+- BigQuery datasets and tables for glossaries and scan results
+- Cloud Monitoring dashboards, alerts, and SLOs
+- IAM bindings for lake-level access control
 
-```
-dataplex-universal-catalog-tf-module/
-├── modules/
-│   ├── manage-lakes/          # Lakes, zones, assets, tasks, IAM
-│   ├── manage-metadata/       # Entry groups, entry types, aspect types, glossaries
-│   └── govern/                # Data quality, profiling, monitoring
-└── examples/
-    ├── basic/                 # Simple setup
-    └── complete/              # Production-ready configuration
-```
+## Compatibility
 
-## ✨ Features
+This module is meant for use with Terraform 1.3+ and tested using Terraform 1.3+.
 
-### 🏞️ [manage-lakes](modules/manage-lakes/) - Lake Management
-- ✅ Dataplex lakes and zones (RAW/CURATED)
-- ✅ Assets (GCS buckets, BigQuery datasets)
-- ✅ IAM bindings and security
-- ✅ Spark jobs and data processing tasks
-- ✅ Service accounts with proper permissions
+## Usage
 
-**Resources:** `google_dataplex_lake`, `google_dataplex_zone`, `google_dataplex_asset`, `google_dataplex_task`
-
-### 📚 [manage-metadata](modules/manage-metadata/) - Metadata Management
-- ✅ Entry groups for organizing data assets
-- ✅ Entry types for custom schemas
-- ✅ Aspect types for metadata templates
-- ✅ Business glossaries (stored in BigQuery)
-
-**Resources:** `google_dataplex_entry_group`, `google_dataplex_entry_type`, `google_dataplex_aspect_type`, `google_dataplex_entry`
-
-### 🛡️ [govern](modules/govern/) - Data Governance
-- ✅ Data quality scans (5 rule types: NON_NULL, UNIQUENESS, REGEX, RANGE, SET_MEMBERSHIP)
-- ✅ Data profiling scans with statistics
-- ✅ Cloud Monitoring dashboards, alerts, and SLOs
-- ✅ BigQuery datasets for results storage
-
-**Resources:** `google_dataplex_datascan`, `google_monitoring_dashboard`, `google_monitoring_alert_policy`
-
-## 🚀 Quick Start
-
-### Using Individual Modules
-
-Each module is **standalone** and can be used independently:
+Basic usage of this module is as follows:
 
 ```hcl
-# Example 1: Just create lakes
-module "lakes" {
-  source = "git::https://github.com/your-org/repo.git//modules/manage-lakes"
+module "dataplex" {
+  source  = "terraform-google-modules/dataplex/google"
+  version = "~> 1.0"
 
   project_id = "my-project"
   region     = "us-central1"
   location   = "us-central1"
 
+  # Enable or disable features
+  enable_manage_lakes = true
+  enable_metadata     = true
+  enable_governance   = true
+
+  # Create lakes with zones
   lakes = [
     {
-      lake_id = "analytics-lake"
+      lake_id      = "analytics-lake"
+      display_name = "Analytics Data Lake"
+      description  = "Central analytics lake"
       zones = [
-        { zone_id = "raw-zone", type = "RAW" },
-        { zone_id = "curated-zone", type = "CURATED" }
+        {
+          zone_id      = "raw-zone"
+          type         = "RAW"
+          display_name = "Raw Data Zone"
+        },
+        {
+          zone_id      = "curated-zone"
+          type         = "CURATED"
+          display_name = "Curated Data Zone"
+        }
       ]
     }
   ]
-}
 
-# Example 2: Add data quality
-module "quality" {
-  source = "git::https://github.com/your-org/repo.git//modules/govern"
-
-  project_id = "my-project"
-  region     = "us-central1"
-  location   = "us-central1"
-
+  # Configure data quality scans
   quality_scans = [
     {
-      scan_id     = "customer-quality"
-      lake_id     = "analytics-lake"
-      data_source = "//bigquery.googleapis.com/projects/my-project/datasets/customers"
+      scan_id      = "customer-quality"
+      lake_id      = "analytics-lake"
+      display_name = "Customer Data Quality"
+      data_source  = "//bigquery.googleapis.com/projects/my-project/datasets/customers/tables/customer_master"
       rules = [
-        { rule_type = "NON_NULL", column = "customer_id", threshold = 1.0 }
+        {
+          rule_type  = "NON_NULL"
+          column     = "customer_id"
+          threshold  = 1.0
+          dimension  = "COMPLETENESS"
+        },
+        {
+          rule_type  = "UNIQUENESS"
+          column     = "customer_id"
+          threshold  = 1.0
+          dimension  = "UNIQUENESS"
+        }
       ]
     }
   ]
-}
 
-# Example 3: Add metadata management
-module "metadata" {
-  source = "git::https://github.com/your-org/repo.git//modules/manage-metadata"
-
-  project_id = "my-project"
-  region     = "us-central1"
-  location   = "us-central1"
-
+  # Create entry groups for catalog
   entry_groups = [
-    { entry_group_id = "customer-data", display_name = "Customer Data" }
+    {
+      entry_group_id = "customer-data"
+      display_name   = "Customer Data Assets"
+      description    = "Entry group for customer-related data assets"
+    }
   ]
+
+  labels = {
+    environment = "production"
+    managed_by  = "terraform"
+  }
 }
 ```
 
-## 📖 Module Documentation
+Functional examples are included in the [examples](./examples/) directory.
 
-Each module has comprehensive documentation:
+## Submodules
 
-- [manage-lakes README](modules/manage-lakes/README.md)
-- [manage-metadata README](modules/manage-metadata/README.md)
-- [govern README](modules/govern/README.md)
+This module includes the following submodules for focused functionality:
 
-## 📋 Examples
+- **[manage-lakes](./modules/manage-lakes/)**: Create and manage Dataplex lakes, zones, assets, and tasks
+- **[manage-metadata](./modules/manage-metadata/)**: Manage catalog resources (entry groups, entry types, aspect types, glossaries)
+- **[govern](./modules/govern/)**: Configure data quality scans, profiling, and monitoring
 
-### Basic Example
-See [examples/basic/](examples/basic/) for a simple, minimal configuration.
+Each submodule can be used independently. See the submodule READMEs for detailed usage.
 
+## Features
+
+### Manage Lakes Module
+- Create Dataplex lakes and zones (RAW/CURATED)
+- Register BigQuery and Cloud Storage assets
+- Configure IAM bindings at lake level
+- Create Spark jobs and data processing tasks
+- KMS encryption support
+- Service account management
+
+### Metadata Management Module
+- Entry groups for organizing catalog entries
+- Entry types (data assets, tables) with custom schemas
+- Aspect types (data quality, business metadata, lineage)
+- Business glossaries stored in BigQuery
+- Glossary term relationships and hierarchies
+
+### Governance Module
+- Data quality scans with 5 rule types:
+  - NON_NULL: Check for null values
+  - UNIQUENESS: Check for unique values
+  - REGEX: Pattern matching validation
+  - RANGE: Value range validation
+  - SET_MEMBERSHIP: Value in allowed set
+- Data profiling scans for statistical analysis
+- BigQuery storage for scan results
+- Cloud Monitoring dashboards
+- Alerting policies and SLOs
+- Log-based metrics
+
+<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| project\_id | The GCP project ID where Dataplex resources will be created | `string` | n/a | yes |
+| region | The GCP region for regional resources | `string` | n/a | yes |
+| location | The GCP location for Dataplex resources | `string` | n/a | yes |
+| enable\_manage\_lakes | Enable the manage lakes module (lakes, zones, assets) | `bool` | `true` | no |
+| enable\_metadata | Enable the metadata management module (catalog, glossaries) | `bool` | `true` | no |
+| enable\_governance | Enable the governance module (data quality, profiling, monitoring) | `bool` | `true` | no |
+| enable\_manage | Enable lake management (lakes, zones, assets) | `bool` | `true` | no |
+| enable\_secure | Enable security features (IAM, encryption, audit logging) | `bool` | `true` | no |
+| enable\_process | Enable data processing (Spark jobs, tasks) | `bool` | `true` | no |
+| enable\_catalog | Enable catalog functionality (entry groups, entry types, aspect types) | `bool` | `true` | no |
+| enable\_glossaries | Enable business glossaries (stored in BigQuery) | `bool` | `true` | no |
+| enable\_profiling | Enable data profiling scans | `bool` | `true` | no |
+| enable\_quality | Enable data quality scans | `bool` | `true` | no |
+| enable\_monitoring | Enable monitoring and alerting for data quality | `bool` | `true` | no |
+| lakes | List of Dataplex lakes to create with their zones | `list(object)` | `[]` | no |
+| iam\_bindings | IAM bindings for Dataplex lakes | `list(object)` | `[]` | no |
+| spark\_jobs | List of Spark jobs to create as Dataplex tasks | `list(object)` | `[]` | no |
+| entry\_groups | List of entry groups to create in the catalog | `list(object)` | `[]` | no |
+| glossaries | List of business glossaries with terms | `list(object)` | `[]` | no |
+| quality\_scans | List of data quality scans to create | `list(object)` | `[]` | no |
+| profiling\_scans | List of data profiling scans to create | `list(object)` | `[]` | no |
+| labels | Labels to apply to all resources | `map(string)` | `{}` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| lakes | Map of created Dataplex lakes |
+| zones | Map of created Dataplex zones |
+| assets | Map of created Dataplex assets |
+| tasks | Map of created Dataplex tasks |
+| entry\_groups | Map of created entry groups |
+| entry\_types | Map of created entry types |
+| aspect\_types | Map of created aspect types |
+| glossary\_datasets | BigQuery datasets for glossaries |
+| quality\_scans | Map of created data quality scans |
+| profiling\_scans | Map of created data profiling scans |
+| quality\_datasets | BigQuery datasets for quality results |
+| monitoring\_dashboards | Monitoring dashboard URLs |
+| alert\_policies | Alert policy IDs |
+| project\_id | The GCP project ID |
+| region | The GCP region |
+| location | The GCP location |
+
+<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+
+## Requirements
+
+These sections describe requirements for using this module.
+
+### Software
+
+The following dependencies must be available:
+
+- [Terraform](https://www.terraform.io/downloads.html) >= 1.3
+- [Terraform Provider for GCP][terraform-provider-gcp] >= 5.0
+
+### Service Account
+
+A service account with the following roles must be used to provision
+the resources of this module:
+
+- Dataplex Admin: `roles/dataplex.admin`
+- BigQuery Admin: `roles/bigquery.admin`
+- Storage Admin: `roles/storage.admin`
+- Monitoring Admin: `roles/monitoring.admin`
+- Service Account Admin: `roles/iam.serviceAccountAdmin`
+
+### APIs
+
+A project with the following APIs enabled must be used to host the
+resources of this module:
+
+- Dataplex API: `dataplex.googleapis.com`
+- Data Catalog API: `datacatalog.googleapis.com`
+- BigQuery API: `bigquery.googleapis.com`
+- Cloud Storage API: `storage.googleapis.com`
+- Cloud Monitoring API: `monitoring.googleapis.com`
+- Cloud Logging API: `logging.googleapis.com`
+
+Enable APIs using:
 ```bash
-cd examples/basic
-terraform init
-terraform plan
-terraform apply
+gcloud services enable dataplex.googleapis.com \
+  datacatalog.googleapis.com \
+  bigquery.googleapis.com \
+  storage.googleapis.com \
+  monitoring.googleapis.com \
+  logging.googleapis.com
 ```
 
-### Complete Example
-See [examples/complete/](examples/complete/) for a production-ready configuration with all features.
+## Contributing
 
-```bash
-cd examples/complete
-terraform init
-terraform plan
-terraform apply
-```
+Refer to the [contribution guidelines](./CONTRIBUTING.md) for
+information on contributing to this module.
 
-## 🔧 Requirements
+## Changelog
 
-| Name | Version |
-|------|---------|
-| terraform | >= 1.3 |
-| google | >= 5.0, < 7.0 |
+See [CHANGELOG.md](./CHANGELOG.md) for release history.
 
-## 🌐 Required GCP APIs
+## License
 
-Enable these APIs in your GCP project:
+Copyright 2025 Google LLC
 
-```bash
-gcloud services enable dataplex.googleapis.com
-gcloud services enable datacatalog.googleapis.com
-gcloud services enable bigquery.googleapis.com
-gcloud services enable storage.googleapis.com
-gcloud services enable monitoring.googleapis.com
-gcloud services enable logging.googleapis.com
-```
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-## 🎯 Why These Modules?
+    http://www.apache.org/licenses/LICENSE-2.0
 
-### ✅ Most Comprehensive Dataplex Terraform Modules
-- **Only** public modules with Entry Groups & Entry Types
-- **Only** modules with Dataplex Tasks (Spark jobs, notebooks)
-- **Only** modules with full monitoring/alerting
-- Complete data governance (quality + profiling)
-- Production-ready with encryption, IAM, and monitoring
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
-### ✅ Based on Official Google Documentation
-- 100% aligned with [official Dataplex Terraform docs](https://cloud.google.com/dataplex/docs/terraform)
-- No legacy Data Catalog resources
-- Only supported `google_dataplex_*` resources
-
-### ✅ Variable-Driven & Reusable
-- Everything configurable via variables
-- No hardcoded values
-- Can be used by any team in your org
-- Examples for every use case
-
-## 🆚 Comparison with Other Modules
-
-| Feature | This Module | Google Fabric | Auto DQ | drandell |
-|---------|:-----------:|:-------------:|:-------:|:--------:|
-| Lakes & Zones | ✅ | ✅ | ❌ | ✅ |
-| Assets | ✅ | ✅ | ❌ | ✅ |
-| DataScans | ✅ | ✅ | ✅ | ❌ |
-| **Entry Groups** | ✅ | ❌ | ❌ | ❌ |
-| **Entry Types** | ✅ | ❌ | ❌ | ❌ |
-| **Tasks** | ✅ | ❌ | ❌ | ❌ |
-| **Monitoring** | ✅ | ❌ | ❌ | ❌ |
-| **Encryption** | ✅ | ❌ | ❌ | ❌ |
-| Variable-Driven | ✅ | ✅ | ❌ | ❌ |
-
-## 🏢 Usage in Organizations
-
-### For Teams
-Each team can use the modules independently:
-
-```hcl
-# Team A: Only needs lakes
-module "my_lake" {
-  source = "git::https://github.com/your-org/repo.git//modules/manage-lakes"
-  # ... configuration
-}
-
-# Team B: Needs lakes + quality
-module "my_lake" {
-  source = "git::https://github.com/your-org/repo.git//modules/manage-lakes"
-  # ... configuration
-}
-
-module "my_quality" {
-  source = "git::https://github.com/your-org/repo.git//modules/govern"
-  # ... configuration
-}
-```
-
-### For Platform Teams
-Create a wrapper module for your organization:
-
-```hcl
-# your-org-dataplex-module/main.tf
-module "lakes" {
-  source = "git::https://github.com/your-org/repo.git//modules/manage-lakes"
-  # ... pass-through variables
-}
-
-module "metadata" {
-  source = "git::https://github.com/your-org/repo.git//modules/manage-metadata"
-  # ... pass-through variables
-}
-
-module "govern" {
-  source = "git::https://github.com/your-org/repo.git//modules/govern"
-  # ... pass-through variables
-}
-```
-
-## 📚 Resources Created
-
-### All Dataplex Resources (10)
-- `google_dataplex_lake`
-- `google_dataplex_zone`
-- `google_dataplex_asset`
-- `google_dataplex_task`
-- `google_dataplex_datascan`
-- `google_dataplex_entry_group`
-- `google_dataplex_entry_type`
-- `google_dataplex_entry`
-- `google_dataplex_aspect_type`
-- `google_dataplex_lake_iam_*`
-
-### Supporting Resources
-- BigQuery datasets/tables (for metadata & results)
-- Cloud Storage buckets (for artifacts)
-- KMS keys (for encryption)
-- Service accounts (with proper IAM)
-- Monitoring (dashboards, alerts, SLOs)
-- Logging (sinks, metrics)
-
-## 🔒 Security Best Practices
-
-- ✅ KMS encryption for data at rest
-- ✅ IAM bindings at lake level
-- ✅ Service accounts with least privilege
-- ✅ Audit logging enabled
-- ✅ Security monitoring and alerts
-
-## 🤝 Contributing
-
-1. Each module must be self-contained
-2. All variables must have descriptions and types
-3. Include examples for new features
-4. Update module README when adding features
-
-## 📄 License
-
-[Your License]
-
-## 📞 Support
-
-- Documentation: See individual module READMEs
-- Issues: [GitHub Issues](https://github.com/your-org/repo/issues)
-- Official Docs: [Dataplex Terraform Documentation](https://cloud.google.com/dataplex/docs/terraform)
-
-## 🎖️ Credits
-
-Built with ❤️ for production use. Based on [official Google Cloud Dataplex Terraform documentation](https://cloud.google.com/dataplex/docs/terraform).
+[terraform-provider-gcp]: https://www.terraform.io/docs/providers/google/index.html
+[terraform]: https://www.terraform.io/downloads.html
