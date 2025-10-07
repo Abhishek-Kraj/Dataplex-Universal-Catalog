@@ -36,10 +36,6 @@ resource "google_dataplex_entry_type" "data_asset" {
   display_name = "Data Asset Entry Type"
   description  = "Entry type for data assets in Dataplex"
 
-  required_aspects {
-    type = "dataplex.googleapis.com/Schema"
-  }
-
   labels = merge(
     var.labels,
     {
@@ -58,10 +54,6 @@ resource "google_dataplex_entry_type" "table" {
 
   display_name = "Table Entry Type"
   description  = "Entry type for tables in Dataplex"
-
-  required_aspects {
-    type = "dataplex.googleapis.com/Schema"
-  }
 
   labels = merge(
     var.labels,
@@ -85,26 +77,46 @@ resource "google_dataplex_aspect_type" "data_quality" {
   metadata_template = jsonencode({
     type = "record"
     name = "DataQuality"
-    fields = [
+    recordFields = [
       {
-        name = "quality_score"
-        type = "double"
+        name  = "quality_score"
+        type  = "double"
+        index = 1
+        annotations = {
+          description = "Overall quality score (0-1)"
+        }
       },
       {
-        name = "completeness"
-        type = "double"
+        name  = "completeness"
+        type  = "double"
+        index = 2
+        annotations = {
+          description = "Data completeness score (0-1)"
+        }
       },
       {
-        name = "accuracy"
-        type = "double"
+        name  = "accuracy"
+        type  = "double"
+        index = 3
+        annotations = {
+          description = "Data accuracy score (0-1)"
+        }
       },
       {
-        name = "consistency"
-        type = "double"
+        name  = "consistency"
+        type  = "double"
+        index = 4
+        annotations = {
+          description = "Data consistency score (0-1)"
+        }
       },
       {
-        name = "last_assessed"
-        type = "string"
+        name  = "last_assessed"
+        type  = "string"
+        index = 5
+        annotations = {
+          description = "Timestamp of last quality assessment"
+        }
       }
     ]
   })
@@ -131,28 +143,45 @@ resource "google_dataplex_aspect_type" "business_metadata" {
   metadata_template = jsonencode({
     type = "record"
     name = "BusinessMetadata"
-    fields = [
+    recordFields = [
       {
-        name = "owner"
-        type = "string"
+        name  = "owner"
+        type  = "string"
+        index = 1
+        annotations = {
+          description = "Data owner"
+        }
       },
       {
-        name = "domain"
-        type = "string"
+        name  = "domain"
+        type  = "string"
+        index = 2
+        annotations = {
+          description = "Business domain"
+        }
       },
       {
-        name = "steward"
-        type = "string"
+        name  = "steward"
+        type  = "string"
+        index = 3
+        annotations = {
+          description = "Data steward"
+        }
       },
       {
-        name = "business_definition"
-        type = "string"
+        name  = "business_definition"
+        type  = "string"
+        index = 4
+        annotations = {
+          description = "Business definition"
+        }
       },
       {
-        name = "tags"
-        type = {
-          type  = "array"
-          items = "string"
+        name  = "tags"
+        type  = "string"
+        index = 5
+        annotations = {
+          description = "Comma-separated tags"
         }
       }
     ]
@@ -180,28 +209,38 @@ resource "google_dataplex_aspect_type" "lineage" {
   metadata_template = jsonencode({
     type = "record"
     name = "Lineage"
-    fields = [
+    recordFields = [
       {
-        name = "upstream_sources"
-        type = {
-          type  = "array"
-          items = "string"
+        name  = "upstream_sources"
+        type  = "string"
+        index = 1
+        annotations = {
+          description = "Comma-separated upstream source identifiers"
         }
       },
       {
-        name = "downstream_targets"
-        type = {
-          type  = "array"
-          items = "string"
+        name  = "downstream_targets"
+        type  = "string"
+        index = 2
+        annotations = {
+          description = "Comma-separated downstream target identifiers"
         }
       },
       {
-        name = "transformation_logic"
-        type = "string"
+        name  = "transformation_logic"
+        type  = "string"
+        index = 3
+        annotations = {
+          description = "Transformation logic description"
+        }
       },
       {
-        name = "last_updated"
-        type = "string"
+        name  = "last_updated"
+        type  = "string"
+        index = 4
+        annotations = {
+          description = "Last update timestamp"
+        }
       }
     ]
   })
@@ -250,46 +289,69 @@ resource "google_dataplex_aspect_type" "glossary_term" {
   metadata_template = jsonencode({
     type = "record"
     name = "GlossaryTerm"
-    fields = [
+    recordFields = [
       {
-        name = "term_name"
-        type = "string"
-      },
-      {
-        name = "definition"
-        type = "string"
-      },
-      {
-        name = "synonyms"
-        type = {
-          type  = "array"
-          items = "string"
+        name  = "term_name"
+        type  = "string"
+        index = 1
+        annotations = {
+          description = "Term name"
         }
       },
       {
-        name = "related_terms"
-        type = {
-          type  = "array"
-          items = "string"
+        name  = "definition"
+        type  = "string"
+        index = 2
+        annotations = {
+          description = "Term definition"
         }
       },
       {
-        name = "owner"
-        type = "string"
+        name  = "synonyms"
+        type  = "string"
+        index = 3
+        annotations = {
+          description = "Comma-separated synonyms"
+        }
       },
       {
-        name = "status"
-        type = "string"
+        name  = "related_terms"
+        type  = "string"
+        index = 4
+        annotations = {
+          description = "Comma-separated related terms"
+        }
       },
       {
-        name = "domain"
-        type = "string"
+        name  = "owner"
+        type  = "string"
+        index = 5
+        annotations = {
+          description = "Term owner"
+        }
       },
       {
-        name = "examples"
-        type = {
-          type  = "array"
-          items = "string"
+        name  = "status"
+        type  = "string"
+        index = 6
+        annotations = {
+          description = "Term status"
+        }
+      },
+      {
+        name  = "domain"
+        type  = "string"
+        index = 7
+        annotations = {
+          description = "Business domain"
+        }
+      },
+      {
+        name  = "examples"
+        type  = "string"
+        index = 8
+        annotations = {
+          description = "Comma-separated examples"
         }
       }
     ]

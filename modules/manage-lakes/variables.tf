@@ -44,6 +44,10 @@ variable "lakes" {
       display_name  = optional(string)
       description   = optional(string)
       location_type = optional(string, "SINGLE_REGION")
+      # NEW: Support for existing resources
+      existing_bucket  = optional(string)  # For RAW zones - existing GCS bucket name
+      existing_dataset = optional(string)  # For CURATED zones - existing BQ dataset ID
+      create_storage   = optional(bool, true)  # Set to false to skip bucket/dataset creation
     })), [])
   }))
   default = []

@@ -90,6 +90,10 @@ variable "lakes" {
       display_name  = optional(string)
       description   = optional(string)
       location_type = optional(string, "SINGLE_REGION")
+      # Support for existing resources
+      existing_bucket  = optional(string)  # For RAW zones
+      existing_dataset = optional(string)  # For CURATED zones
+      create_storage   = optional(bool, true)  # false = use existing
     })), [])
   }))
   default = []
