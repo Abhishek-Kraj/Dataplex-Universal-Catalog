@@ -62,6 +62,11 @@ output "glossary_datasets" {
   value       = var.enable_metadata ? module.manage_metadata[0].glossary_dataset : null
 }
 
+output "glossary_tables" {
+  description = "BigQuery tables for glossary data"
+  value       = var.enable_metadata ? module.manage_metadata[0].glossary_tables : {}
+}
+
 # ==============================================================================
 # GOVERNANCE OUTPUTS
 # ==============================================================================
@@ -76,9 +81,14 @@ output "profiling_scans" {
   value       = var.enable_governance ? module.govern[0].profiling_scans : {}
 }
 
-output "quality_datasets" {
-  description = "BigQuery datasets for quality results"
+output "quality_dataset" {
+  description = "BigQuery dataset for quality results"
   value       = var.enable_governance ? module.govern[0].quality_dataset : null
+}
+
+output "profiling_dataset" {
+  description = "BigQuery dataset for profiling results"
+  value       = var.enable_governance ? module.govern[0].profiling_dataset : null
 }
 
 output "monitoring_dashboards" {

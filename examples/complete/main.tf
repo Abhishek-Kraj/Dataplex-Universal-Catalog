@@ -1,19 +1,34 @@
 # Complete Example - Production-Ready Configuration
-# This example demonstrates all features of the Dataplex modules
+# This example demonstrates all features of the Dataplex module
 
 # =============================================================================
-# MANAGE LAKES MODULE - Full Configuration
+# UNIFIED DATAPLEX MODULE - COMPLETE CONFIGURATION
 # =============================================================================
-module "manage_lakes" {
-  source = "../../modules/manage-lakes"
+module "dataplex" {
+  source = "../.."
 
   project_id = var.project_id
   region     = var.region
   location   = var.location
 
+  # Enable all features
+  enable_manage_lakes = true
+  enable_metadata     = true
+  enable_governance   = true
+
+  # Lake management settings
   enable_manage  = true
   enable_secure  = true
   enable_process = true
+
+  # Metadata settings
+  enable_catalog    = true
+  enable_glossaries = true
+
+  # Governance settings
+  enable_profiling  = true
+  enable_quality    = true
+  enable_monitoring = true
 
   # Multiple lakes with comprehensive zone configuration
   lakes = [
@@ -111,26 +126,6 @@ module "manage_lakes" {
     }
   ]
 
-  labels = {
-    environment = "production"
-    managed_by  = "terraform"
-    team        = "data-platform"
-  }
-}
-
-# =============================================================================
-# MANAGE METADATA MODULE - Full Configuration
-# =============================================================================
-module "manage_metadata" {
-  source = "../../modules/manage-metadata"
-
-  project_id = var.project_id
-  region     = var.region
-  location   = var.location
-
-  enable_catalog    = true
-  enable_glossaries = true
-
   # Comprehensive entry groups
   entry_groups = [
     {
@@ -209,27 +204,6 @@ module "manage_metadata" {
       ]
     }
   ]
-
-  labels = {
-    environment = "production"
-    managed_by  = "terraform"
-    team        = "data-platform"
-  }
-}
-
-# =============================================================================
-# GOVERN MODULE - Full Configuration
-# =============================================================================
-module "govern" {
-  source = "../../modules/govern"
-
-  project_id = var.project_id
-  region     = var.region
-  location   = var.location
-
-  enable_profiling  = true
-  enable_quality    = true
-  enable_monitoring = true
 
   # Comprehensive quality scans
   quality_scans = [
@@ -321,6 +295,4 @@ module "govern" {
     managed_by  = "terraform"
     team        = "data-platform"
   }
-
-  depends_on = [module.manage_lakes]
 }

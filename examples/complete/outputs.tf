@@ -1,47 +1,70 @@
-# Manage Lakes Outputs
+# Unified Module Outputs
 output "lakes" {
   description = "All created Dataplex lakes"
-  value       = module.manage_lakes.lakes
+  value       = module.dataplex.lakes
 }
 
 output "zones" {
   description = "All created Dataplex zones"
-  value       = module.manage_lakes.zones
+  value       = module.dataplex.zones
 }
 
 output "assets" {
   description = "All created Dataplex assets"
-  value       = module.manage_lakes.assets
+  value       = module.dataplex.assets
 }
 
 output "tasks" {
   description = "All created Dataplex tasks"
-  value       = module.manage_lakes.tasks
+  value       = module.dataplex.tasks
 }
 
-# Manage Metadata Outputs
 output "entry_groups" {
   description = "All created entry groups"
-  value       = module.manage_metadata.entry_groups
+  value       = module.dataplex.entry_groups
 }
 
-output "glossaries" {
-  description = "All created business glossaries"
-  value       = module.manage_metadata.glossaries
+output "entry_types" {
+  description = "All created entry types"
+  value       = module.dataplex.entry_types
 }
 
-# Govern Outputs
+output "aspect_types" {
+  description = "All created aspect types"
+  value       = module.dataplex.aspect_types
+}
+
+output "glossary_datasets" {
+  description = "BigQuery datasets for glossaries"
+  value       = module.dataplex.glossary_datasets
+}
+
 output "quality_scans" {
   description = "All created data quality scans"
-  value       = module.govern.quality_scans
+  value       = module.dataplex.quality_scans
 }
 
 output "profiling_scans" {
   description = "All created data profiling scans"
-  value       = module.govern.profiling_scans
+  value       = module.dataplex.profiling_scans
+}
+
+output "quality_dataset" {
+  description = "BigQuery dataset for quality results"
+  value       = module.dataplex.quality_dataset
+}
+
+output "profiling_dataset" {
+  description = "BigQuery dataset for profiling results"
+  value       = module.dataplex.profiling_dataset
 }
 
 output "monitoring_dashboards" {
   description = "Monitoring dashboard URLs"
-  value       = module.govern.monitoring_dashboards
+  value       = module.dataplex.monitoring_dashboards
+}
+
+output "alert_policies" {
+  description = "Alert policy IDs"
+  value       = module.dataplex.alert_policies
 }
