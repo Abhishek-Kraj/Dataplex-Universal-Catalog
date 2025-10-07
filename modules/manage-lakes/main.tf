@@ -305,44 +305,12 @@ resource "google_project_iam_member" "dataplex_sa_roles" {
   member  = "serviceAccount:${google_service_account.dataplex_sa[0].email}"
 }
 
-# Create KMS key ring for encryption
-resource "google_kms_key_ring" "dataplex" {
-  count = var.enable_secure ? 1 : 0
-
-  name     = "dataplex-keyring"
-  location = var.location
-  project  = var.project_id
-}
-
-# Create KMS crypto key for data encryption
-resource "google_kms_crypto_key" "dataplex_data" {
-  count = var.enable_secure ? 1 : 0
-
-  name            = "dataplex-data-key"
-  key_ring        = google_kms_key_ring.dataplex[0].id
-  rotation_period = "7776000s" # 90 days
-
-  lifecycle {
-    prevent_destroy = true
-  }
-
-  labels = merge(
-    var.labels,
-    {
-      module  = "manage-lakes"
-      purpose = "data-encryption"
-    }
-  )
-}
-
-# Grant KMS permissions to Dataplex service account
-resource "google_kms_crypto_key_iam_member" "dataplex_sa_encrypter" {
-  count = var.enable_secure ? 1 : 0
-
-  crypto_key_id = google_kms_crypto_key.dataplex_data[0].id
-  role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
-  member        = "serviceAccount:${google_service_account.dataplex_sa[0].email}"
-}
+# ==============================================================================
+# SECURE: CUSTOMER-MANAGED ENCRYPTION (CMEK)
+# ==============================================================================
+# Note: Dataplex CMEK is configured at the ORGANIZATION level, not per resource
+# Use: gcloud dataplex encryption-config create default --location=LOCATION --organization=ORG_ID --key=KEY_ID
+# This module does not create KMS keys as they are not directly used by Dataplex resources
 
 # Create IAM Conditions for time-based access
 resource "google_dataplex_lake_iam_binding" "time_bound_access" {

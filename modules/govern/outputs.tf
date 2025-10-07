@@ -20,14 +20,14 @@ output "profiling_dataset" {
 
 output "dashboard_url" {
   description = "Monitoring dashboard URL"
-  value       = var.enable_monitoring ? google_monitoring_dashboard.dataplex_overview.id : null
+  value       = var.enable_monitoring ? google_monitoring_dashboard.dataplex_overview[0].id : null
 }
 
 output "alert_policy_ids" {
   description = "List of alert policy IDs"
   value       = var.enable_monitoring ? [
-    google_monitoring_alert_policy.quality_failures.id,
-    google_monitoring_alert_policy.scan_failures.id,
-    google_monitoring_alert_policy.lake_health.id
+    google_monitoring_alert_policy.quality_failures[0].id,
+    google_monitoring_alert_policy.scan_failures[0].id,
+    google_monitoring_alert_policy.lake_health[0].id
   ] : []
 }

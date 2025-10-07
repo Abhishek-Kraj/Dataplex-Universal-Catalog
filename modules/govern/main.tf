@@ -602,6 +602,8 @@ resource "google_bigquery_table" "latest_profiling_view" {
 
 # Create notification channel for alerts
 resource "google_monitoring_notification_channel" "email" {
+  count = var.enable_monitoring ? 1 : 0
+
   display_name = "Dataplex Email Notifications"
   type         = "email"
   project      = var.project_id
@@ -615,6 +617,7 @@ resource "google_monitoring_notification_channel" "email" {
 
 # Alert policy for data quality failures
 resource "google_monitoring_alert_policy" "quality_failures" {
+  count = var.enable_monitoring ? 1 : 0
   display_name = "Dataplex - Data Quality Failures"
   project      = var.project_id
   combiner     = "OR"
@@ -635,7 +638,7 @@ resource "google_monitoring_alert_policy" "quality_failures" {
     }
   }
 
-  notification_channels = [google_monitoring_notification_channel.email.id]
+  notification_channels = [google_monitoring_notification_channel.email[0].id]
 
   alert_strategy {
     auto_close = "1800s"
@@ -651,6 +654,8 @@ resource "google_monitoring_alert_policy" "quality_failures" {
 
 # Alert policy for scan failures
 resource "google_monitoring_alert_policy" "scan_failures" {
+  count = var.enable_monitoring ? 1 : 0
+
   display_name = "Dataplex - Scan Failures"
   project      = var.project_id
   combiner     = "OR"
@@ -671,7 +676,7 @@ resource "google_monitoring_alert_policy" "scan_failures" {
     }
   }
 
-  notification_channels = [google_monitoring_notification_channel.email.id]
+  notification_channels = [google_monitoring_notification_channel.email[0].id]
 
   documentation {
     content   = "One or more data scans have failed. Check the scan logs for error details."
@@ -683,6 +688,8 @@ resource "google_monitoring_alert_policy" "scan_failures" {
 
 # Alert policy for lake health
 resource "google_monitoring_alert_policy" "lake_health" {
+  count = var.enable_monitoring ? 1 : 0
+
   display_name = "Dataplex - Lake Health Issues"
   project      = var.project_id
   combiner     = "OR"
@@ -703,7 +710,7 @@ resource "google_monitoring_alert_policy" "lake_health" {
     }
   }
 
-  notification_channels = [google_monitoring_notification_channel.email.id]
+  notification_channels = [google_monitoring_notification_channel.email[0].id]
 
   documentation {
     content   = "One or more lakes are in an unhealthy state. Review lake configuration and asset status."
@@ -715,6 +722,8 @@ resource "google_monitoring_alert_policy" "lake_health" {
 
 # Create monitoring dashboard
 resource "google_monitoring_dashboard" "dataplex_overview" {
+  count = var.enable_monitoring ? 1 : 0
+
   dashboard_json = jsonencode({
     displayName = "Dataplex Overview Dashboard"
 
@@ -915,7 +924,9 @@ resource "google_monitoring_dashboard" "dataplex_overview" {
 
 # Create SLO for data quality
 resource "google_monitoring_slo" "data_quality_slo" {
-  service      = google_monitoring_custom_service.dataplex.service_id
+  count = var.enable_monitoring ? 1 : 0
+
+  service      = google_monitoring_custom_service.dataplex[0].service_id
   slo_id       = "data-quality-slo"
   display_name = "Data Quality SLO - 95% Quality Score"
   project      = var.project_id
@@ -933,6 +944,8 @@ resource "google_monitoring_slo" "data_quality_slo" {
 
 # Create custom service for SLO
 resource "google_monitoring_custom_service" "dataplex" {
+  count = var.enable_monitoring ? 1 : 0
+
   service_id   = "dataplex-service"
   display_name = "Dataplex Service"
   project      = var.project_id
@@ -940,6 +953,8 @@ resource "google_monitoring_custom_service" "dataplex" {
 
 # Create log-based metric for quality failures
 resource "google_logging_metric" "quality_failures" {
+  count = var.enable_monitoring ? 1 : 0
+
   name    = "dataplex/quality_failures"
   project = var.project_id
   filter  = <<-EOT
