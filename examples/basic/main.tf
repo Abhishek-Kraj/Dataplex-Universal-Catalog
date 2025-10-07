@@ -1,68 +1,151 @@
-# Basic Example - Minimal Dataplex Universal Catalog Setup
+# Basic Example - Direct Module Usage
+# This example shows how to use individual Dataplex modules directly
 
-module "dataplex" {
-  source = "../.."
+# =============================================================================
+# MANAGE LAKES MODULE
+# =============================================================================
+module "manage_lakes" {
+  source = "../../modules/manage-lakes"
 
   project_id = var.project_id
   region     = var.region
   location   = var.location
 
-  # Enable only basic features
-  enable_discover        = true
-  enable_manage_metadata = true
-  enable_manage_lakes    = true
-  enable_govern          = false # Disable for basic setup
+  enable_manage  = true
+  enable_secure  = true
+  enable_process = true
 
-  # Basic discover configuration
-  discover_config = {
-    enable_search    = true
-    enable_taxonomy  = true
-    enable_templates = true
-    policy_tags      = ["Confidential", "Public", "Internal"]
-  }
+  # Define a simple lake with bronze and silver zones
+  lakes = [
+    {
+      lake_id      = "analytics-lake"
+      display_name = "Analytics Lake"
+      description  = "Basic data lake for analytics"
 
-  # Basic metadata configuration
-  manage_metadata_config = {
-    enable_catalog    = true
-    enable_glossaries = true
-    entry_groups = [
-      {
-        entry_group_id = "customer-data"
-        display_name   = "Customer Data Entry Group"
-        description    = "Entry group for customer-related data assets"
-      }
-    ]
-  }
+      zones = [
+        {
+          zone_id       = "bronze-zone"
+          type          = "RAW"
+          display_name  = "Bronze Zone"
+          description   = "Raw data landing zone"
+          location_type = "SINGLE_REGION"
+        },
+        {
+          zone_id       = "silver-zone"
+          type          = "CURATED"
+          display_name  = "Silver Zone"
+          description   = "Curated data zone"
+          location_type = "SINGLE_REGION"
+        }
+      ]
+    }
+  ]
 
-  # Basic lake configuration
-  manage_lakes_config = {
-    enable_manage  = true
-    enable_secure  = false # Disable for basic setup
-    enable_process = false # Disable for basic setup
-    lakes = [
-      {
-        lake_id      = "analytics-lake"
-        display_name = "Analytics Lake"
-        description  = "Lake for analytics and reporting data"
-        zones = [
-          {
-            zone_id      = "raw-zone"
-            type         = "RAW"
-            display_name = "Raw Data Zone"
-          },
-          {
-            zone_id      = "curated-zone"
-            type         = "CURATED"
-            display_name = "Curated Data Zone"
-          }
-        ]
-      }
-    ]
-  }
+  # Basic IAM binding
+  iam_bindings = [
+    {
+      lake_id = "analytics-lake"
+      role    = "roles/dataplex.viewer"
+      members = [
+        "group:data-analysts@example.com"
+      ]
+    }
+  ]
 
   labels = {
-    environment = "dev"
+    environment = "development"
     managed_by  = "terraform"
-    project     = "dataplex-basic"
   }
+}
+
+# =============================================================================
+# MANAGE METADATA MODULE
+# =============================================================================
+module "manage_metadata" {
+  source = "../../modules/manage-metadata"
+
+  project_id = var.project_id
+  region     = var.region
+  location   = var.location
+
+  enable_catalog    = true
+  enable_glossaries = false
+
+  # Basic entry groups
+  entry_groups = [
+    {
+      entry_group_id = "customer-data"
+      display_name   = "Customer Data"
+      description    = "Customer information and analytics"
+    },
+    {
+      entry_group_id = "product-data"
+      display_name   = "Product Data"
+      description    = "Product catalog"
+    }
+  ]
+
+  labels = {
+    environment = "development"
+    managed_by  = "terraform"
+  }
+}
+
+# =============================================================================
+# GOVERN MODULE
+# =============================================================================
+module "govern" {
+  source = "../../modules/govern"
+
+  project_id = var.project_id
+  region     = var.region
+  location   = var.location
+
+  enable_profiling  = true
+  enable_quality    = true
+  enable_monitoring = true
+
+  # Basic quality scan
+  quality_scans = [
+    {
+      scan_id      = "customer-quality"
+      lake_id      = "analytics-lake"
+      display_name = "Customer Quality Check"
+      description  = "Basic data quality validation"
+      data_source  = "//bigquery.googleapis.com/projects/${var.project_id}/datasets/customers/tables/customer_master"
+
+      rules = [
+        {
+          rule_type  = "NON_NULL"
+          column     = "customer_id"
+          threshold  = 1.0
+          dimension  = "COMPLETENESS"
+        },
+        {
+          rule_type  = "UNIQUENESS"
+          column     = "customer_id"
+          threshold  = 1.0
+          dimension  = "UNIQUENESS"
+        }
+      ]
+    }
+  ]
+
+  # Basic profiling scan
+  profiling_scans = [
+    {
+      scan_id      = "customer-profile"
+      lake_id      = "analytics-lake"
+      display_name = "Customer Data Profile"
+      description  = "Statistical profiling"
+      data_source  = "//bigquery.googleapis.com/projects/${var.project_id}/datasets/customers/tables/customer_master"
+    }
+  ]
+
+  labels = {
+    environment = "development"
+    managed_by  = "terraform"
+  }
+
+  depends_on = [module.manage_lakes]
 }

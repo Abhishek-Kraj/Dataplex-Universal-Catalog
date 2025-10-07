@@ -1,54 +1,47 @@
-output "taxonomy_id" {
-  description = "The ID of the created taxonomy"
-  value       = module.dataplex.discover_taxonomy_id
-}
-
-output "policy_tags" {
-  description = "Created policy tags"
-  value       = module.dataplex.discover_policy_tags
-}
-
+# Manage Lakes Outputs
 output "lakes" {
-  description = "Created lakes"
-  value       = module.dataplex.lakes
+  description = "All created Dataplex lakes"
+  value       = module.manage_lakes.lakes
 }
 
 output "zones" {
-  description = "Created zones"
-  value       = module.dataplex.zones
+  description = "All created Dataplex zones"
+  value       = module.manage_lakes.zones
 }
 
 output "assets" {
-  description = "Created assets"
-  value       = module.dataplex.assets
+  description = "All created Dataplex assets"
+  value       = module.manage_lakes.assets
 }
 
+output "tasks" {
+  description = "All created Dataplex tasks"
+  value       = module.manage_lakes.tasks
+}
+
+# Manage Metadata Outputs
 output "entry_groups" {
-  description = "Created entry groups"
-  value       = module.dataplex.entry_groups
+  description = "All created entry groups"
+  value       = module.manage_metadata.entry_groups
 }
 
 output "glossaries" {
-  description = "Created glossaries"
-  value       = module.dataplex.glossaries
+  description = "All created business glossaries"
+  value       = module.manage_metadata.glossaries
 }
 
+# Govern Outputs
 output "quality_scans" {
-  description = "Created quality scans"
-  value       = module.dataplex.quality_scans
+  description = "All created data quality scans"
+  value       = module.govern.quality_scans
 }
 
 output "profiling_scans" {
-  description = "Created profiling scans"
-  value       = module.dataplex.profiling_scans
+  description = "All created data profiling scans"
+  value       = module.govern.profiling_scans
 }
 
 output "monitoring_dashboards" {
-  description = "Created monitoring dashboards"
-  value       = module.dataplex.monitoring_dashboards
-}
-
-output "module_status" {
-  description = "Status of enabled modules"
-  value       = module.dataplex.module_status
+  description = "Monitoring dashboard URLs"
+  value       = module.govern.monitoring_dashboards
 }
