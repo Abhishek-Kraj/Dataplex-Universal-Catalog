@@ -4,58 +4,37 @@ This directory contains example implementations of the Dataplex Universal Catalo
 
 ## 📁 Available Examples
 
-### 1. Basic Example (`basic/`)
-**Purpose**: Minimal setup for getting started quickly
+### Example (`example/`)
+**Purpose**: Comprehensive example demonstrating all module capabilities
 
 **Includes**:
-- 1 Lake with 2 zones (RAW, CURATED)
+- 1 Lake with 10 zones (RAW and CURATED)
+- All zone/storage combinations (RAW+GCS, RAW+BigQuery, CURATED+GCS, CURATED+BigQuery)
 - Data Catalog taxonomy with 3 policy tags
-- 1 Entry group
-- Metadata templates
-- Basic search infrastructure
+- 1 Entry group with custom metadata templates
+- Business glossary with terms
+- Data quality scans with multiple rules
+- Data profiling scans
+- Discovery settings
+- Search infrastructure
 
-**Use Case**: Development, testing, proof-of-concept
+**Use Case**: Development, testing, proof-of-concept, production reference
 
-**Deployment Time**: ~5-10 minutes
-
-**Navigate**:
-```bash
-cd basic/
-```
-
-### 2. Complete Example (`complete/`)
-**Purpose**: Full-featured enterprise deployment
-
-**Includes**:
-- 3 Lakes with 5 zones
-- 8 policy tags for data classification
-- 4 Entry groups
-- 2 Business glossaries with terms
-- 3 Data quality scans with 15+ rules
-- 3 Data profiling scans
-- IAM bindings
-- Spark jobs
-- Security features (KMS, audit logging)
-- Monitoring dashboards and alerts
-
-**Use Case**: Production, enterprise deployments
-
-**Deployment Time**: ~15-20 minutes
+**Deployment Time**: ~10-15 minutes
 
 **Navigate**:
 ```bash
-cd complete/
+cd example/
 ```
 
 ---
 
 ## 🚀 How to Use
 
-### Step 1: Choose an Example
+### Step 1: Navigate to Example
 
-Start with **basic** for your first deployment:
 ```bash
-cd basic/
+cd example/
 ```
 
 ### Step 2: Configure Variables
@@ -93,7 +72,7 @@ Terraform has been successfully initialized!
 terraform plan
 ```
 
-Review the resources that will be created. Expected resources for basic example: **20-30 resources**.
+Review the resources that will be created. Expected resources: **~47 resources**.
 
 ### Step 5: Deploy
 
@@ -131,52 +110,44 @@ Type `yes` when prompted.
 
 ---
 
-## 📊 Comparison Matrix
+## 📊 Example Features
 
-| Feature | Basic | Complete |
-|---------|-------|----------|
-| **Lakes** | 1 | 3 |
-| **Zones** | 2 | 5 |
-| **Policy Tags** | 3 | 8 |
-| **Entry Groups** | 1 | 4 |
-| **Glossaries** | 0 | 2 with terms |
-| **Quality Scans** | 0 | 3 with 15+ rules |
-| **Profiling Scans** | 0 | 3 |
-| **IAM Bindings** | No | Yes |
-| **Security Features** | No | Yes (KMS, logging) |
-| **Spark Jobs** | No | Yes |
-| **Monitoring** | No | Yes (dashboards, alerts) |
-| **Resources Created** | ~25 | ~80+ |
-| **Deployment Time** | 5-10 min | 15-20 min |
-| **Monthly Cost (Est)** | $20-50 | $100-200 |
+| Feature | Included |
+|---------|----------|
+| **Lakes** | 1 |
+| **Zones** | 10 (all combinations) |
+| **Zone Types** | RAW + CURATED |
+| **Storage Types** | GCS Buckets + BigQuery Datasets |
+| **Policy Tags** | 3 |
+| **Entry Groups** | 1 with metadata templates |
+| **Glossaries** | 1 with terms |
+| **Quality Scans** | Yes (multiple rules) |
+| **Profiling Scans** | Yes |
+| **Discovery Settings** | Yes |
+| **Resources Created** | ~47 |
+| **Deployment Time** | 10-15 min |
 
 ---
 
 ## 🎯 Learning Path
 
 ### Phase 1: Basic Understanding
-1. Deploy **basic** example
+1. Deploy the example
 2. Explore created resources in GCP Console
 3. Understand module structure
 4. Review Terraform state
 
 ### Phase 2: Customization
-1. Modify basic example variables
+1. Modify example variables
 2. Add custom policy tags
 3. Change region/location
-4. Add labels
+4. Test different zone/storage combinations
 
-### Phase 3: Advanced Features
-1. Deploy **complete** example
-2. Configure quality scans
-3. Set up IAM bindings
-4. Enable monitoring
-
-### Phase 4: Production
-1. Create custom configuration
+### Phase 3: Production Planning
+1. Create custom configuration for your organization
 2. Add organization-specific glossaries
 3. Configure data quality rules
-4. Set up alerting policies
+4. Plan data classification strategy
 
 ---
 
