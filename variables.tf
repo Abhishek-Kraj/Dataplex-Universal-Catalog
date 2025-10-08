@@ -91,9 +91,13 @@ variable "lakes" {
       description   = optional(string)
       location_type = optional(string, "SINGLE_REGION")
       # Support for existing resources
-      existing_bucket  = optional(string)  # For RAW zones
-      existing_dataset = optional(string)  # For CURATED zones
-      create_storage   = optional(bool, true)  # false = use existing
+      existing_bucket  = optional(string)  # For RAW zones - name of existing GCS bucket
+      existing_dataset = optional(string)  # For CURATED zones - ID of existing BigQuery dataset
+      create_storage   = optional(bool, true)  # Set to false to use existing resources
+
+      # Custom names for new resources (only used when create_storage = true)
+      bucket_name  = optional(string)  # Custom GCS bucket name (default: "${project_id}-${lake_id}-${zone_id}")
+      dataset_id   = optional(string)  # Custom BigQuery dataset ID (default: "${lake_id}_${zone_id}")
     })), [])
   }))
   default = []
@@ -224,4 +228,44 @@ variable "labels" {
   description = "Labels to apply to all resources"
   type        = map(string)
   default     = {}
+}
+
+# ==============================================================================
+# PROCESS - SPARK SQL TASKS
+# ==============================================================================
+
+variable "spark_sql_jobs" {
+  description = "List of Spark SQL jobs to create"
+  type = list(object({
+    job_id        = string
+    lake_id       = string
+    display_name  = optional(string)
+    description   = optional(string)
+    sql_script    = optional(string)
+    sql_file_uri  = optional(string)
+    file_uris     = optional(list(string))
+    archive_uris  = optional(list(string))
+    schedule      = optional(string)
+  }))
+  default = []
+}
+
+# ==============================================================================
+# PROCESS - NOTEBOOK TASKS
+# ==============================================================================
+
+variable "notebook_jobs" {
+  description = "List of Jupyter notebook jobs to create"
+  type = list(object({
+    job_id          = string
+    lake_id         = string
+    display_name    = optional(string)
+    description     = optional(string)
+    notebook_uri    = string
+    file_uris       = optional(list(string))
+    archive_uris    = optional(list(string))
+    container_image = optional(string)
+    schedule        = optional(string)
+  }))
+  default = []
 }

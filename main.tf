@@ -34,9 +34,11 @@ module "manage_lakes" {
   enable_secure  = var.enable_secure
   enable_process = var.enable_process
 
-  lakes        = var.lakes
-  iam_bindings = var.iam_bindings
-  spark_jobs   = var.spark_jobs
+  lakes          = var.lakes
+  iam_bindings   = var.iam_bindings
+  spark_jobs     = var.spark_jobs
+  spark_sql_jobs = var.spark_sql_jobs
+  notebook_jobs  = var.notebook_jobs
 
   labels = var.labels
 }

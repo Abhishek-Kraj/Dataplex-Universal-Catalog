@@ -10,6 +10,11 @@ module "dataplex" {
   enable_metadata     = true
   enable_governance   = true
 
+  # Manage Lakes settings
+  enable_manage  = true
+  enable_secure  = false  # Disable security features (audit, KMS, service accounts)
+  enable_process = false  # Disable Spark processing jobs
+
   # Metadata settings
   enable_catalog    = true
   enable_glossaries = true

@@ -42,6 +42,9 @@ locals {
         existing_bucket  = zone.existing_bucket
         existing_dataset = zone.existing_dataset
         create_storage   = coalesce(zone.create_storage, true)
+        # Custom names for new resources
+        bucket_name      = zone.bucket_name
+        dataset_id       = zone.dataset_id
       }
     ]
   ]) : []
@@ -109,7 +112,7 @@ resource "google_storage_bucket" "raw_zone_bucket" {
     if v.type == "RAW"
   }
 
-  name     = "${var.project_id}-${each.value.lake_id}-${each.value.zone_id}"
+  name     = coalesce(each.value.bucket_name, "${var.project_id}-${each.value.lake_id}-${each.value.zone_id}")
   location = var.location
   project  = var.project_id
 
@@ -157,7 +160,7 @@ resource "google_bigquery_dataset" "curated_zone_dataset" {
     if v.type == "CURATED"
   }
 
-  dataset_id  = replace("${each.value.lake_id}_${each.value.zone_id}", "-", "_")
+  dataset_id  = coalesce(each.value.dataset_id, replace("${each.value.lake_id}_${each.value.zone_id}", "-", "_"))
   project     = var.project_id
   location    = var.location
   description = "Curated zone dataset for ${each.value.lake_id}"
@@ -673,6 +676,125 @@ resource "google_dataplex_task" "data_analysis_notebook" {
     {
       module = "manage-lakes"
       type   = "notebook"
+    }
+  )
+
+  depends_on = [google_dataplex_lake.lakes]
+}
+
+# ==============================================================================
+# PROCESS: SPARK SQL TASKS
+# ==============================================================================
+
+# Create Spark SQL tasks for SQL-based transformations
+resource "google_dataplex_task" "spark_sql_jobs" {
+  for_each = var.enable_process ? { for job in var.spark_sql_jobs : job.job_id => job } : {}
+
+  task_id      = each.value.job_id
+  location     = var.location
+  lake         = each.value.lake_id
+  project      = var.project_id
+  display_name = coalesce(each.value.display_name, each.value.job_id)
+  description  = coalesce(each.value.description, "Spark SQL job: ${each.value.job_id}")
+
+  trigger_spec {
+    type     = each.value.schedule != null ? "RECURRING" : "ON_DEMAND"
+    schedule = each.value.schedule  # Cron format string, not a block
+  }
+
+  execution_spec {
+    service_account = google_service_account.spark_runner[0].email
+  }
+
+  spark {
+    # Either inline SQL script or file URI
+    sql_script      = each.value.sql_script
+    sql_script_file = each.value.sql_file_uri
+
+    # Additional files and archives
+    file_uris    = coalesce(each.value.file_uris, [])
+    archive_uris = coalesce(each.value.archive_uris, [])
+
+    infrastructure_spec {
+      batch {
+        executors_count     = 2
+        max_executors_count = 5
+      }
+      vpc_network {
+        network_tags = ["dataplex-spark"]
+      }
+    }
+  }
+
+  labels = merge(
+    var.labels,
+    {
+      module  = "manage-lakes"
+      lake_id = each.value.lake_id
+      type    = "spark-sql"
+    }
+  )
+
+  depends_on = [google_dataplex_lake.lakes]
+}
+
+# ==============================================================================
+# PROCESS: NOTEBOOK TASKS  
+# ==============================================================================
+
+# Create Jupyter notebook tasks for interactive data analysis
+resource "google_dataplex_task" "notebook_jobs" {
+  for_each = var.enable_process ? { for job in var.notebook_jobs : job.job_id => job } : {}
+
+  task_id      = each.value.job_id
+  location     = var.location
+  lake         = each.value.lake_id
+  project      = var.project_id
+  display_name = coalesce(each.value.display_name, each.value.job_id)
+  description  = coalesce(each.value.description, "Notebook job: ${each.value.job_id}")
+
+  trigger_spec {
+    type     = each.value.schedule != null ? "RECURRING" : "ON_DEMAND"
+    schedule = each.value.schedule  # Cron format string, not a block
+  }
+
+  execution_spec {
+    service_account = google_service_account.spark_runner[0].email
+  }
+
+  notebook {
+    notebook = each.value.notebook_uri
+
+    # Additional files and archives
+    file_uris    = coalesce(each.value.file_uris, [])
+    archive_uris = coalesce(each.value.archive_uris, [])
+
+    infrastructure_spec {
+      batch {
+        executors_count     = 2
+        max_executors_count = 10
+      }
+
+      # Optional custom container image
+      dynamic "container_image" {
+        for_each = each.value.container_image != null ? [1] : []
+        content {
+          image = each.value.container_image
+        }
+      }
+
+      vpc_network {
+        network_tags = ["dataplex-spark"]
+      }
+    }
+  }
+
+  labels = merge(
+    var.labels,
+    {
+      module  = "manage-lakes"
+      lake_id = each.value.lake_id
+      type    = "notebook"
     }
   )
 
