@@ -161,22 +161,43 @@ Set `create_storage = false` and provide existing resource names:
 
 ```hcl
 zones = [
-  # RAW zone with existing GCS bucket
+  # RAW zone with existing GCS bucket (most common)
   {
     zone_id          = "claims-raw-zone"
     type             = "RAW"
     existing_bucket  = "acrwe-claims-data-lake"  # Existing bucket name
     create_storage   = false                      # Don't create new bucket
   },
-  # CURATED zone with existing BigQuery dataset
+
+  # RAW zone with existing BigQuery dataset (also supported!)
+  {
+    zone_id          = "raw-structured-zone"
+    type             = "RAW"
+    existing_dataset = "raw_structured_data"      # Existing dataset ID
+    create_storage   = false                      # Don't create new dataset
+  },
+
+  # CURATED zone with existing BigQuery dataset (most common)
   {
     zone_id          = "claims-analytics-zone"
     type             = "CURATED"
     existing_dataset = "acrwe_claims_analytics"   # Existing dataset ID
     create_storage   = false                      # Don't create new dataset
+  },
+
+  # CURATED zone with existing GCS bucket (also supported!)
+  {
+    zone_id          = "curated-parquet-zone"
+    type             = "CURATED"
+    existing_bucket  = "curated-parquet-files"    # Existing bucket name
+    create_storage   = false                      # Don't create new bucket
   }
 ]
 ```
+
+**Important:** Both RAW and CURATED zones can use either GCS buckets OR BigQuery datasets!
+- **RAW zones**: No restrictions - can store any format in GCS or BigQuery
+- **CURATED zones**: Only structured data - GCS must be Parquet/Avro/ORC, BigQuery must have schema
 
 ### Creating New Resources with Custom Names
 

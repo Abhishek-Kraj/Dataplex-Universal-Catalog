@@ -177,11 +177,12 @@ resource "google_bigquery_dataset" "curated_zone_dataset" {
   delete_contents_on_destroy = false
 }
 
-# Create Dataplex Assets for GCS buckets (RAW zones)
-resource "google_dataplex_asset" "raw_assets" {
+# Create Dataplex Assets for GCS buckets (any zone type)
+resource "google_dataplex_asset" "gcs_assets" {
   for_each = {
     for k, v in local.zones_map : k => v
-    if v.type == "RAW"
+    # Create GCS asset if user provided bucket (either new or existing)
+    if (v.create_storage && v.existing_dataset == null && v.dataset_id == null) || (!v.create_storage && v.existing_bucket != null)
   }
 
   name          = replace("${each.value.lake_id}-${each.value.zone_id}-asset", "_", "-")
@@ -189,7 +190,7 @@ resource "google_dataplex_asset" "raw_assets" {
   location      = var.location
   dataplex_zone = google_dataplex_zone.zones[each.key].id
   display_name  = "${each.value.lake_id} ${each.value.zone_id} Asset"
-  description   = "Asset for RAW zone ${each.value.zone_id}"
+  description   = "GCS bucket asset for ${each.value.type} zone ${each.value.zone_id}"
 
   resource_spec {
     name = each.value.create_storage ? (
@@ -209,16 +210,18 @@ resource "google_dataplex_asset" "raw_assets" {
     var.labels,
     {
       module     = "manage-lakes"
+      zone_type  = lower(each.value.type)
       asset_type = "gcs-bucket"
     }
   )
 }
 
-# Create Dataplex Assets for BigQuery datasets (CURATED zones)
-resource "google_dataplex_asset" "curated_assets" {
+# Create Dataplex Assets for BigQuery datasets (any zone type)
+resource "google_dataplex_asset" "bigquery_assets" {
   for_each = {
     for k, v in local.zones_map : k => v
-    if v.type == "CURATED"
+    # Create BQ asset if user provided dataset (either new or existing)
+    if (v.create_storage && v.existing_bucket == null && v.bucket_name == null) || (!v.create_storage && v.existing_dataset != null)
   }
 
   name          = replace("${each.value.lake_id}-${each.value.zone_id}-asset", "_", "-")
@@ -226,7 +229,7 @@ resource "google_dataplex_asset" "curated_assets" {
   location      = var.location
   dataplex_zone = google_dataplex_zone.zones[each.key].id
   display_name  = "${each.value.lake_id} ${each.value.zone_id} Asset"
-  description   = "Asset for CURATED zone ${each.value.zone_id}"
+  description   = "BigQuery dataset asset for ${each.value.type} zone ${each.value.zone_id}"
 
   resource_spec {
     name = each.value.create_storage ? (
@@ -246,6 +249,7 @@ resource "google_dataplex_asset" "curated_assets" {
     var.labels,
     {
       module     = "manage-lakes"
+      zone_type  = lower(each.value.type)
       asset_type = "bigquery-dataset"
     }
   )

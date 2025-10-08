@@ -11,8 +11,8 @@ output "zones" {
 output "assets" {
   description = "Map of asset IDs to their details"
   value = merge(
-    google_dataplex_asset.raw_assets,
-    google_dataplex_asset.curated_assets
+    google_dataplex_asset.gcs_assets,
+    google_dataplex_asset.bigquery_assets
   )
 }
 

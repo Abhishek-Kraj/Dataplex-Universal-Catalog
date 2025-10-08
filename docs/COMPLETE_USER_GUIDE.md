@@ -332,9 +332,15 @@ You should see:
 
 ### 2. **Zone**
 - Subdivision within a lake
-- Two types:
-  - **RAW** - For raw, unprocessed data (GCS buckets)
-  - **CURATED** - For processed, clean data (BigQuery datasets)
+- Two types with different data requirements:
+  - **RAW** - For raw, unprocessed data
+    - ✅ Can use **GCS buckets** (any format)
+    - ✅ Can use **BigQuery datasets** (any data)
+    - No restrictions on data format or structure
+  - **CURATED** - For processed, structured data
+    - ✅ Can use **GCS buckets** (Parquet/Avro/ORC only)
+    - ✅ Can use **BigQuery datasets** (must have schema)
+    - Structured data only, no schema drift allowed
 
 ### 3. **Asset**
 - Actual data storage resource
