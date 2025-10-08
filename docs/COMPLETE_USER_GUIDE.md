@@ -33,22 +33,38 @@ This Terraform module helps you set up **Google Cloud Dataplex** - a data catalo
 
 ```
 Insurance Data Lake
-├── Raw Zones (GCS Buckets)
+├── Raw Zones (GCS Buckets)                      ✅ Terraform Supported
 │   ├── Claims Data
 │   ├── Policy Data
 │   └── Customer Data
-├── Curated Zones (BigQuery Datasets)
+├── Curated Zones (BigQuery Datasets)            ✅ Terraform Supported
 │   ├── Claims Analytics
 │   ├── Policy Underwriting
 │   └── Customer Insights
-├── Metadata & Catalog
-│   ├── Entry Groups (organize assets)
-│   ├── Business Glossary (define terms)
-│   └── Aspect Types (custom metadata)
-└── Data Quality
-    ├── Quality Scans (validate data)
-    └── Profiling Scans (analyze data)
+├── Metadata & Catalog                           ✅ Terraform Supported
+│   ├── Entry Groups (organize assets)           ✅ Terraform Supported
+│   ├── Entry Types (define entry schemas)       ✅ Terraform Supported
+│   ├── Aspect Types (custom metadata)           ✅ Terraform Supported
+│   └── Business Glossary (define terms)         ✅ Terraform Supported
+├── Data Quality                                 ✅ Terraform Supported
+│   ├── Quality Scans (validate data)            ✅ Terraform Supported
+│   └── Profiling Scans (analyze data)           ✅ Terraform Supported
+├── Data Lineage                                 ⚠️  Auto-generated (not in Terraform)
+│   └── Table/column lineage tracking            ⚠️  Use Console/API
+├── Search & Discovery                           ⚠️  Use Console/API
+│   ├── Full-text search across catalog          ⚠️  Console only
+│   └── Tag-based filtering                      ⚠️  Console only
+└── Advanced Features (Not in Terraform)         ❌ Not Terraform Supported
+    ├── Column-level aspects                     ❌ Use SDK/API
+    ├── Custom search interfaces                 ❌ Use Console
+    ├── Data lineage graph visualization         ❌ Use Console
+    └── Policy tag enforcement                   ❌ Use BigQuery directly
 ```
+
+**Legend:**
+- ✅ **Terraform Supported** - Fully managed by this module
+- ⚠️ **Auto-generated/Console** - Created automatically or requires Console/API
+- ❌ **Not Terraform Supported** - Use GCP Console, SDK, or API
 
 ---
 
