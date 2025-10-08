@@ -546,9 +546,9 @@ resource "google_bigquery_table" "term_relationships" {
       mode = "REQUIRED"
     },
     {
-      name = "relationship_type"
-      type = "STRING"
-      mode = "REQUIRED"
+      name        = "relationship_type"
+      type        = "STRING"
+      mode        = "REQUIRED"
       description = "Types: SYNONYM, RELATED, PARENT, CHILD, REPLACES, REPLACED_BY"
     },
     {

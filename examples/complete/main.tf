@@ -216,28 +216,28 @@ module "dataplex" {
 
       rules = [
         {
-          rule_type  = "NON_NULL"
-          column     = "customer_id"
-          threshold  = 1.0
-          dimension  = "COMPLETENESS"
+          rule_type = "NON_NULL"
+          column    = "customer_id"
+          threshold = 1.0
+          dimension = "COMPLETENESS"
         },
         {
-          rule_type  = "UNIQUENESS"
-          column     = "customer_id"
-          threshold  = 1.0
-          dimension  = "UNIQUENESS"
+          rule_type = "UNIQUENESS"
+          column    = "customer_id"
+          threshold = 1.0
+          dimension = "UNIQUENESS"
         },
         {
-          rule_type  = "REGEX"
-          column     = "email"
-          threshold  = 0.98
-          dimension  = "VALIDITY"
+          rule_type = "REGEX"
+          column    = "email"
+          threshold = 0.98
+          dimension = "VALIDITY"
         },
         {
-          rule_type  = "RANGE"
-          column     = "age"
-          threshold  = 0.95
-          dimension  = "VALIDITY"
+          rule_type = "RANGE"
+          column    = "age"
+          threshold = 0.95
+          dimension = "VALIDITY"
         }
       ]
     },
@@ -250,16 +250,16 @@ module "dataplex" {
 
       rules = [
         {
-          rule_type  = "NON_NULL"
-          column     = "product_id"
-          threshold  = 1.0
-          dimension  = "COMPLETENESS"
+          rule_type = "NON_NULL"
+          column    = "product_id"
+          threshold = 1.0
+          dimension = "COMPLETENESS"
         },
         {
-          rule_type  = "NON_NULL"
-          column     = "price"
-          threshold  = 1.0
-          dimension  = "COMPLETENESS"
+          rule_type = "NON_NULL"
+          column    = "price"
+          threshold = 1.0
+          dimension = "COMPLETENESS"
         }
       ]
     }

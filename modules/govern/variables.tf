@@ -40,10 +40,10 @@ variable "quality_scans" {
     description  = optional(string)
     data_source  = string
     rules = optional(list(object({
-      rule_type  = string
-      column     = optional(string)
-      threshold  = optional(number, 0.95)
-      dimension  = optional(string, "COMPLETENESS")
+      rule_type = string
+      column    = optional(string)
+      threshold = optional(number, 0.95)
+      dimension = optional(string, "COMPLETENESS")
     })), [])
   }))
   default = []

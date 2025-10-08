@@ -617,7 +617,7 @@ resource "google_monitoring_notification_channel" "email" {
 
 # Alert policy for data quality failures
 resource "google_monitoring_alert_policy" "quality_failures" {
-  count = var.enable_monitoring ? 1 : 0
+  count        = var.enable_monitoring ? 1 : 0
   display_name = "Dataplex - Data Quality Failures"
   project      = var.project_id
   combiner     = "OR"
@@ -936,7 +936,7 @@ resource "google_monitoring_slo" "data_quality_slo" {
 
   request_based_sli {
     good_total_ratio {
-      good_service_filter = "resource.type=\"dataplex.googleapis.com/DataScan\" AND metric.type=\"dataplex.googleapis.com/data_scan/quality_score\" AND metric.label.score >= 0.90"
+      good_service_filter  = "resource.type=\"dataplex.googleapis.com/DataScan\" AND metric.type=\"dataplex.googleapis.com/data_scan/quality_score\" AND metric.label.score >= 0.90"
       total_service_filter = "resource.type=\"dataplex.googleapis.com/DataScan\" AND metric.type=\"dataplex.googleapis.com/data_scan/quality_score\""
     }
   }
@@ -963,9 +963,9 @@ resource "google_logging_metric" "quality_failures" {
   EOT
 
   metric_descriptor {
-    metric_kind = "DELTA"
-    value_type  = "INT64"
-    unit        = "1"
+    metric_kind  = "DELTA"
+    value_type   = "INT64"
+    unit         = "1"
     display_name = "Data Quality Failures"
 
     labels {

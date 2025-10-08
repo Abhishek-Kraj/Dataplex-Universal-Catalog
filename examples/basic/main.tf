@@ -12,8 +12,8 @@ module "dataplex" {
 
   # Manage Lakes settings
   enable_manage  = true
-  enable_secure  = false  # Disable security features (audit, KMS, service accounts)
-  enable_process = false  # Disable Spark processing jobs
+  enable_secure  = false # Disable security features (audit, KMS, service accounts)
+  enable_process = false # Disable Spark processing jobs
 
   # Metadata settings
   enable_catalog    = true
@@ -31,24 +31,24 @@ module "dataplex" {
       zones = [
         # RAW Zone 1: Claims Data
         {
-          zone_id          = "claims-raw-zone"
-          type             = "RAW"
-          existing_bucket  = "acrwe-claims-data-lake"
-          create_storage   = false
+          zone_id         = "claims-raw-zone"
+          type            = "RAW"
+          existing_bucket = "acrwe-claims-data-lake"
+          create_storage  = false
         },
         # RAW Zone 2: Policy Data
         {
-          zone_id          = "policy-raw-zone"
-          type             = "RAW"
-          existing_bucket  = "acrwe-policy-data-warehouse"
-          create_storage   = false
+          zone_id         = "policy-raw-zone"
+          type            = "RAW"
+          existing_bucket = "acrwe-policy-data-warehouse"
+          create_storage  = false
         },
         # RAW Zone 3: Customer Analytics
         {
-          zone_id          = "customer-raw-zone"
-          type             = "RAW"
-          existing_bucket  = "acrwe-customer-analytics"
-          create_storage   = false
+          zone_id         = "customer-raw-zone"
+          type            = "RAW"
+          existing_bucket = "acrwe-customer-analytics"
+          create_storage  = false
         },
         # CURATED Zone 1: Claims Analytics
         {
@@ -149,16 +149,16 @@ module "dataplex" {
       data_source  = "//bigquery.googleapis.com/projects/${var.project_id}/datasets/acrwe_claims_analytics/tables/claims_master"
       rules = [
         {
-          rule_type  = "NON_NULL"
-          column     = "claim_id"
-          threshold  = 1.0
-          dimension  = "COMPLETENESS"
+          rule_type = "NON_NULL"
+          column    = "claim_id"
+          threshold = 1.0
+          dimension = "COMPLETENESS"
         },
         {
-          rule_type  = "UNIQUENESS"
-          column     = "claim_id"
-          threshold  = 1.0
-          dimension  = "UNIQUENESS"
+          rule_type = "UNIQUENESS"
+          column    = "claim_id"
+          threshold = 1.0
+          dimension = "UNIQUENESS"
         }
       ]
     }

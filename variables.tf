@@ -91,13 +91,13 @@ variable "lakes" {
       description   = optional(string)
       location_type = optional(string, "SINGLE_REGION")
       # Support for existing resources
-      existing_bucket  = optional(string)  # For RAW zones - name of existing GCS bucket
-      existing_dataset = optional(string)  # For CURATED zones - ID of existing BigQuery dataset
-      create_storage   = optional(bool, true)  # Set to false to use existing resources
+      existing_bucket  = optional(string)     # For RAW zones - name of existing GCS bucket
+      existing_dataset = optional(string)     # For CURATED zones - ID of existing BigQuery dataset
+      create_storage   = optional(bool, true) # Set to false to use existing resources
 
       # Custom names for new resources (only used when create_storage = true)
-      bucket_name  = optional(string)  # Custom GCS bucket name (default: "${project_id}-${lake_id}-${zone_id}")
-      dataset_id   = optional(string)  # Custom BigQuery dataset ID (default: "${lake_id}_${zone_id}")
+      bucket_name = optional(string) # Custom GCS bucket name (default: "${project_id}-${lake_id}-${zone_id}")
+      dataset_id  = optional(string) # Custom BigQuery dataset ID (default: "${lake_id}_${zone_id}")
     })), [])
   }))
   default = []
@@ -199,10 +199,10 @@ variable "quality_scans" {
     description  = optional(string)
     data_source  = string
     rules = optional(list(object({
-      rule_type  = string # NON_NULL, UNIQUENESS, REGEX, RANGE, SET_MEMBERSHIP
-      column     = optional(string)
-      threshold  = optional(number, 0.95)
-      dimension  = optional(string, "COMPLETENESS")
+      rule_type = string # NON_NULL, UNIQUENESS, REGEX, RANGE, SET_MEMBERSHIP
+      column    = optional(string)
+      threshold = optional(number, 0.95)
+      dimension = optional(string, "COMPLETENESS")
     })), [])
   }))
   default = []
@@ -237,15 +237,15 @@ variable "labels" {
 variable "spark_sql_jobs" {
   description = "List of Spark SQL jobs to create"
   type = list(object({
-    job_id        = string
-    lake_id       = string
-    display_name  = optional(string)
-    description   = optional(string)
-    sql_script    = optional(string)
-    sql_file_uri  = optional(string)
-    file_uris     = optional(list(string))
-    archive_uris  = optional(list(string))
-    schedule      = optional(string)
+    job_id       = string
+    lake_id      = string
+    display_name = optional(string)
+    description  = optional(string)
+    sql_script   = optional(string)
+    sql_file_uri = optional(string)
+    file_uris    = optional(list(string))
+    archive_uris = optional(list(string))
+    schedule     = optional(string)
   }))
   default = []
 }

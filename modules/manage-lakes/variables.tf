@@ -45,13 +45,13 @@ variable "lakes" {
       description   = optional(string)
       location_type = optional(string, "SINGLE_REGION")
       # Support for existing resources
-      existing_bucket  = optional(string)  # For RAW zones - existing GCS bucket name
-      existing_dataset = optional(string)  # For CURATED zones - existing BQ dataset ID
-      create_storage   = optional(bool, true)  # Set to false to skip bucket/dataset creation
+      existing_bucket  = optional(string)     # For RAW zones - existing GCS bucket name
+      existing_dataset = optional(string)     # For CURATED zones - existing BQ dataset ID
+      create_storage   = optional(bool, true) # Set to false to skip bucket/dataset creation
 
       # Custom names for new resources (only used when create_storage = true)
-      bucket_name  = optional(string)  # Custom GCS bucket name (default: auto-generated)
-      dataset_id   = optional(string)  # Custom BigQuery dataset ID (default: auto-generated)
+      bucket_name = optional(string) # Custom GCS bucket name (default: auto-generated)
+      dataset_id  = optional(string) # Custom BigQuery dataset ID (default: auto-generated)
     })), [])
   }))
   default = []
@@ -84,15 +84,15 @@ variable "spark_jobs" {
 variable "spark_sql_jobs" {
   description = "List of Spark SQL jobs to create"
   type = list(object({
-    job_id        = string
-    lake_id       = string
-    display_name  = optional(string)
-    description   = optional(string)
-    sql_script    = optional(string)        # Inline SQL script
-    sql_file_uri  = optional(string)        # GCS path to SQL file
-    file_uris     = optional(list(string))  # Additional files
-    archive_uris  = optional(list(string))  # JAR/ZIP dependencies
-    schedule      = optional(string)        # Cron schedule
+    job_id       = string
+    lake_id      = string
+    display_name = optional(string)
+    description  = optional(string)
+    sql_script   = optional(string)       # Inline SQL script
+    sql_file_uri = optional(string)       # GCS path to SQL file
+    file_uris    = optional(list(string)) # Additional files
+    archive_uris = optional(list(string)) # JAR/ZIP dependencies
+    schedule     = optional(string)       # Cron schedule
   }))
   default = []
 }

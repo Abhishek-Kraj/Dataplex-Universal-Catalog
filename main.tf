@@ -52,8 +52,8 @@ module "manage_metadata" {
   region     = var.region
   location   = var.location
 
-  enable_catalog     = var.enable_catalog
-  enable_glossaries  = var.enable_glossaries
+  enable_catalog    = var.enable_catalog
+  enable_glossaries = var.enable_glossaries
 
   entry_groups = var.entry_groups
   glossaries   = var.glossaries

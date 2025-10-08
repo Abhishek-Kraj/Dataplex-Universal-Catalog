@@ -45,7 +45,7 @@ Insurance Data Lake
 │   ├── Entry Groups (organize assets)           ✅ Terraform Supported
 │   ├── Entry Types (define entry schemas)       ✅ Terraform Supported
 │   ├── Aspect Types (custom metadata)           ✅ Terraform Supported
-│   └── Business Glossary (define terms)         ✅ Terraform Supported
+│   └── Business Glossary (define terms)         ⚠️  Custom Implementation (BigQuery tables)
 ├── Data Quality                                 ✅ Terraform Supported
 │   ├── Quality Scans (validate data)            ✅ Terraform Supported
 │   └── Profiling Scans (analyze data)           ✅ Terraform Supported
@@ -365,6 +365,8 @@ You should see:
 - Business vocabulary and definitions
 - Defines standardized terms
 - Example: Define what "Customer" or "Revenue" means
+- **Note**: Dataplex native glossaries are not available in Terraform (Console/API only)
+- This module implements glossaries using **BigQuery tables** as a workaround
 
 ### 8. **Data Scans**
 - **Quality Scans** - Validate data quality rules

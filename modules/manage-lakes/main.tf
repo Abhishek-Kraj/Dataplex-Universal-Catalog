@@ -43,8 +43,8 @@ locals {
         existing_dataset = zone.existing_dataset
         create_storage   = coalesce(zone.create_storage, true)
         # Custom names for new resources
-        bucket_name      = zone.bucket_name
-        dataset_id       = zone.dataset_id
+        bucket_name = zone.bucket_name
+        dataset_id  = zone.dataset_id
       }
     ]
   ]) : []
@@ -182,7 +182,7 @@ resource "google_dataplex_asset" "gcs_assets" {
   for_each = {
     for k, v in local.zones_map : k => v
     # Create GCS asset if user provided bucket (either new or existing)
-    if (v.create_storage && v.existing_dataset == null && v.dataset_id == null) || (!v.create_storage && v.existing_bucket != null)
+    if(v.create_storage && v.existing_dataset == null && v.dataset_id == null) || (!v.create_storage && v.existing_bucket != null)
   }
 
   name          = replace("${each.value.lake_id}-${each.value.zone_id}-asset", "_", "-")
@@ -195,7 +195,7 @@ resource "google_dataplex_asset" "gcs_assets" {
   resource_spec {
     name = each.value.create_storage ? (
       "projects/${var.project_id}/buckets/${google_storage_bucket.raw_zone_bucket[each.key].name}"
-    ) : (
+      ) : (
       "projects/${var.project_id}/buckets/${each.value.existing_bucket}"
     )
     type = "STORAGE_BUCKET"
@@ -221,7 +221,7 @@ resource "google_dataplex_asset" "bigquery_assets" {
   for_each = {
     for k, v in local.zones_map : k => v
     # Create BQ asset if user provided dataset (either new or existing)
-    if (v.create_storage && v.existing_bucket == null && v.bucket_name == null) || (!v.create_storage && v.existing_dataset != null)
+    if(v.create_storage && v.existing_bucket == null && v.bucket_name == null) || (!v.create_storage && v.existing_dataset != null)
   }
 
   name          = replace("${each.value.lake_id}-${each.value.zone_id}-asset", "_", "-")
@@ -234,7 +234,7 @@ resource "google_dataplex_asset" "bigquery_assets" {
   resource_spec {
     name = each.value.create_storage ? (
       "projects/${var.project_id}/datasets/${google_bigquery_dataset.curated_zone_dataset[each.key].dataset_id}"
-    ) : (
+      ) : (
       "projects/${var.project_id}/datasets/${each.value.existing_dataset}"
     )
     type = "BIGQUERY_DATASET"
@@ -703,7 +703,7 @@ resource "google_dataplex_task" "spark_sql_jobs" {
 
   trigger_spec {
     type     = each.value.schedule != null ? "RECURRING" : "ON_DEMAND"
-    schedule = each.value.schedule  # Cron format string, not a block
+    schedule = each.value.schedule # Cron format string, not a block
   }
 
   execution_spec {
@@ -759,7 +759,7 @@ resource "google_dataplex_task" "notebook_jobs" {
 
   trigger_spec {
     type     = each.value.schedule != null ? "RECURRING" : "ON_DEMAND"
-    schedule = each.value.schedule  # Cron format string, not a block
+    schedule = each.value.schedule # Cron format string, not a block
   }
 
   execution_spec {
