@@ -400,23 +400,85 @@ This module is **optimized for GCP ISS (Infrastructure Self-Service) Foundation*
 ### Quick Overview
 
 1. **Create storage** via ISS built-in modules (`builtin_gcs_v2.tf`, `builtin_bigquery.tf`) with org-wide KMS encryption
-2. **Catalog with Dataplex** by referencing existing resources using `existing_bucket` / `existing_dataset`
-3. **No storage creation** in this module - follows ISS separation of concerns
+2. **Add `builtin_dataplex.tf`** to `gcp-foundation/blueprints/level3/runtime_v2/`
+3. **Update tfvars** to reference existing storage resources created by ISS Foundation
 
-### Key Benefits
+### What You Need to Update
 
-✅ **Automatic encryption** - ISS Foundation applies org-wide KMS keys
-✅ **Catalog-only** - Module only catalogs, doesn't create infrastructure
-✅ **ISS compliant** - Follows built-in module patterns
-✅ **No duplicate config** - Single source of truth for infrastructure
+#### In `builtin_dataplex.tf` (one-time setup):
+```hcl
+# Add to: gcp-foundation/blueprints/level3/runtime_v2/builtin_dataplex.tf
+module "project_dataplex" {
+  for_each = local.dataplex_lakes
+  source   = "git::https://github.com/Abhishek-Kraj/Dataplex-Universal-Catalog.git?ref=feature/iss-foundation"
+
+  # These variables are automatically provided by ISS Foundation
+  project_id = local.project_id
+  region     = local.availability_regions[lookup(each.value, "location", "az1")]
+  location   = local.availability_regions[lookup(each.value, "location", "az1")]
+
+  lakes = lookup(each.value, "lakes", [])
+  # ... (see full template in docs/ISS_INTEGRATION.md)
+}
+```
+
+#### In your tfvars (per project):
+```hcl
+# Example: gcp-foundation/tfvars/pru/prod/projects/claims.tfvars
+
+# 1. Create buckets (existing ISS Foundation code)
+gcs_buckets_v2 = {
+  "claims-raw-data" : {
+    storage_class = "STANDARD"
+    location      = "az1"
+  }
+}
+
+# 2. Create datasets (existing ISS Foundation code)
+bigquery_datasets = {
+  "claims_analytics" : {
+    location = "az1"
+  }
+}
+
+# 3. NEW: Catalog with Dataplex (reference the resources created above)
+dataplex_lakes = {
+  "insurance-catalog" : {
+    lakes = [{
+      lake_id = "insurance-lake"
+      zones = [
+        {
+          zone_id         = "claims-raw"
+          type            = "RAW"
+          # Use FULL bucket name as created by ISS Foundation
+          existing_bucket = "${LBU}-${ENV}-${STAGE}-${APPREF}-${AZ}-claims-raw-data"
+        },
+        {
+          zone_id          = "claims-analytics"
+          type             = "CURATED"
+          # Use dataset key from bigquery_datasets above
+          existing_dataset = "claims_analytics"
+        }
+      ]
+    }]
+  }
+}
+```
+
+### Key Points
+
+✅ **Bucket names**: Use FULL ISS naming pattern `${LBU}-${ENV}-${STAGE}-${APPREF}-${AZ}-{name}`
+✅ **Dataset names**: Use the key from `bigquery_datasets` (e.g., `claims_analytics`)
+✅ **No new infrastructure**: Module only catalogs existing resources
+✅ **Automatic encryption**: ISS Foundation handles via `local.encryption.encryption_symmetric_keys`
 
 **📖 Complete ISS Integration Guide:** [docs/ISS_INTEGRATION.md](docs/ISS_INTEGRATION.md)
 
 Includes:
-- Step-by-step integration instructions
-- `builtin_dataplex.tf` template for `blueprints/level3/runtime_v2/`
-- Complete tfvars examples
-- Naming convention guidance
+- Full `builtin_dataplex.tf` template
+- Complete tfvars examples with all features
+- Naming convention details
+- Deployment workflow
 - Troubleshooting
 
 ---
