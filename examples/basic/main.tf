@@ -43,12 +43,20 @@ module "dataplex" {
           existing_bucket = "acrwe-policy-data-warehouse"
           create_storage  = false
         },
-        # RAW Zone 3: Customer Analytics
+        # RAW Zone 3: Customer Analytics (GCS)
         {
           zone_id         = "customer-raw-zone"
           type            = "RAW"
           existing_bucket = "acrwe-customer-analytics"
           create_storage  = false
+        },
+        # RAW Zone 4: Test RAW zone with BigQuery dataset (NEW FEATURE)
+        {
+          zone_id          = "raw-structured-zone"
+          type             = "RAW"
+          display_name     = "RAW Zone with BigQuery Dataset"
+          existing_dataset = "acrwe_analytics_warehouse"
+          create_storage   = false
         },
         # CURATED Zone 1: Claims Analytics
         {
@@ -84,6 +92,14 @@ module "dataplex" {
           type             = "CURATED"
           existing_dataset = "acrwe_ml_feature_store"
           create_storage   = false
+        },
+        # CURATED Zone 6: Test CURATED zone with GCS bucket (NEW FEATURE)
+        {
+          zone_id         = "curated-parquet-zone"
+          type            = "CURATED"
+          display_name    = "CURATED Zone with GCS Bucket (Parquet)"
+          existing_bucket = "acrwe-policy-data-warehouse"
+          create_storage  = false
         }
       ]
     }
