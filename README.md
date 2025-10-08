@@ -210,100 +210,29 @@ terraform apply
 
 ## ISS Foundation Integration
 
-For **GCP ISS (Infrastructure Self-Service) Foundation** users:
+This module is **optimized for GCP ISS (Infrastructure Self-Service) Foundation** integration.
 
-### Step 1: Create Storage via ISS Built-ins
+### Quick Overview
 
-```hcl
-# In your tfvars - Create infrastructure FIRST
-gcs_buckets_v2 = {
-  "raw-data" : {
-    storage_class = "STANDARD"
-    location      = "az1"  # Encrypted with org-wide KMS
-  }
-}
+1. **Create storage** via ISS built-in modules (`builtin_gcs_v2.tf`, `builtin_bigquery.tf`) with org-wide KMS encryption
+2. **Catalog with Dataplex** by referencing existing resources using `existing_bucket` / `existing_dataset`
+3. **No storage creation** in this module - follows ISS separation of concerns
 
-bigquery_datasets = {
-  "analytics" : {
-    location = "az1"  # Encrypted with org-wide KMS
-  }
-}
-```
+### Key Benefits
 
-### Step 2: Add Dataplex Cataloging
+✅ **Automatic encryption** - ISS Foundation applies org-wide KMS keys
+✅ **Catalog-only** - Module only catalogs, doesn't create infrastructure
+✅ **ISS compliant** - Follows built-in module patterns
+✅ **No duplicate config** - Single source of truth for infrastructure
 
-Create `builtin_dataplex.tf` in `blueprints/level3/runtime_v2/`:
+**📖 Complete ISS Integration Guide:** [docs/ISS_INTEGRATION.md](docs/ISS_INTEGRATION.md)
 
-```hcl
-variable "dataplex_lakes" {
-  type    = any
-  default = {}
-}
-
-module "project_dataplex" {
-  for_each = local.dataplex_lakes
-
-  source = "github.com/Abhishek-Kraj/Dataplex-Universal-Catalog"
-
-  project_id = local.project_id
-  region     = local.availability_regions[lookup(each.value, "location", "az1")]
-  location   = local.availability_regions[lookup(each.value, "location", "az1")]
-
-  enable_manage_lakes = true
-  enable_metadata     = lookup(each.value, "enable_metadata", true)
-  enable_governance   = lookup(each.value, "enable_governance", true)
-
-  # Don't create infrastructure (ISS Foundation handles this)
-  enable_secure  = false
-  enable_process = false
-
-  # Catalog configuration
-  lakes           = lookup(each.value, "lakes", [])
-  entry_groups    = lookup(each.value, "entry_groups", [])
-  quality_scans   = lookup(each.value, "quality_scans", [])
-  profiling_scans = lookup(each.value, "profiling_scans", [])
-
-  labels = {
-    lbu    = local.lbu
-    env    = local.env
-    stage  = local.stage
-    appref = local.appref
-  }
-}
-```
-
-### Step 3: Configure in tfvars
-
-```hcl
-dataplex_lakes = {
-  "analytics-catalog" : {
-    location = "az1"
-    lakes = [{
-      lake_id = "analytics-lake"
-      zones = [
-        {
-          zone_id          = "raw-zone"
-          type             = "RAW"
-          existing_bucket  = "pru-prod-runtime-app-az1-raw-data"  # From Step 1
-        },
-        {
-          zone_id          = "curated-zone"
-          type             = "CURATED"
-          existing_dataset = "analytics"  # From Step 1
-        }
-      ]
-    }]
-  }
-}
-```
-
-**Key Points for ISS:**
-- ✅ Storage created by `builtin_gcs_v2.tf` / `builtin_bigquery.tf` (with org-wide encryption)
-- ✅ Dataplex only catalogs (references `existing_bucket` / `existing_dataset`)
-- ✅ No encryption configuration needed in Dataplex module
-- ✅ Follows ISS separation of concerns pattern
-
-**Full ISS Integration Guide:** [docs/ISS_INTEGRATION.md](docs/ISS_INTEGRATION.md)
+Includes:
+- Step-by-step integration instructions
+- `builtin_dataplex.tf` template for `blueprints/level3/runtime_v2/`
+- Complete tfvars examples
+- Naming convention guidance
+- Troubleshooting
 
 ---
 
