@@ -233,6 +233,41 @@ gcloud services enable dataplex.googleapis.com \
   logging.googleapis.com
 ```
 
+## Quotas and Limits
+
+### GCP Dataplex Quotas
+
+This module is subject to GCP Dataplex quotas enforced at the **per-project, per-region** level:
+
+| Resource | Quota Scope | Notes |
+|----------|-------------|-------|
+| Lakes | Per project, per region | Check GCP Console for specific limits |
+| Zones | Per lake | Multiple zones per lake allowed |
+| Assets | Per zone | One asset per GCS bucket or BigQuery dataset |
+| Tasks | Per project, per region | Quality/profiling scans |
+
+**Check your quotas:**
+```bash
+# Navigate to GCP Console
+https://console.cloud.google.com/iam-admin/quotas?project=YOUR_PROJECT_ID
+
+# Filter by "Dataplex" to view current usage and limits
+```
+
+**Official Documentation:** [Dataplex Quotas and Limits](https://cloud.google.com/dataplex/docs/quotas)
+
+### Terraform Module Limits
+
+**This module has NO hardcoded limits.** It uses dynamic `for_each` loops to create resources based on your configuration. Limits are determined by:
+
+- ✅ GCP Dataplex quotas (per project)
+- ✅ BigQuery quotas (for BigQuery datasets)
+- ✅ Cloud Storage quotas (for GCS buckets)
+- ❌ NOT by this Terraform module
+
+**Request quota increases:**
+If you need higher limits, request a quota increase via [GCP Console](https://console.cloud.google.com/iam-admin/quotas).
+
 ## Contributing
 
 Refer to the [contribution guidelines](./CONTRIBUTING.md) for

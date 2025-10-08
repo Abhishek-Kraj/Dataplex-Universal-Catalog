@@ -17,6 +17,7 @@
 9. [Common Use Cases](#common-use-cases)
 10. [Troubleshooting](#troubleshooting)
 11. [Best Practices](#best-practices)
+12. [Quotas and Limits](#quotas-and-limits)
 
 ---
 
@@ -76,6 +77,7 @@ You need:
 - ✅ A GCP Project with billing enabled
 - ✅ APIs enabled: Dataplex, BigQuery, Cloud Storage, Data Catalog
 - ✅ Appropriate IAM permissions
+- ✅ Awareness of [GCP Dataplex quotas](#quotas-and-limits)
 
 **Enable APIs:**
 ```bash
@@ -1666,8 +1668,101 @@ git/
 ### Get Help
 
 - Check [Troubleshooting](#troubleshooting) section
-- Review [examples/basic](../examples/basic/) for working configurations
+- Review [examples/example](../examples/example/) for working configurations
 - Open GitHub issue: https://github.com/Abhishek-Kraj/Dataplex-Universal-Catalog/issues
+
+---
+
+## Quotas and Limits
+
+### GCP Dataplex Resource Quotas
+
+Resource quotas are enforced at the **per-project, per-region** level for Dataplex resources:
+
+| Resource Type | Scope | Notes |
+|---------------|-------|-------|
+| **Lakes** | Per project, per region | Check your quota in GCP Console |
+| **Zones** | Per lake | Multiple zones allowed per lake |
+| **Assets** | Per zone | Each asset maps to one GCS bucket or BigQuery dataset |
+| **Tasks (On-demand)** | Per project, per region | Quality/profiling scans |
+| **Tasks (Recurring)** | Per project, per region | Scheduled scans |
+
+**Official Documentation:** [Dataplex Quotas and Limits](https://cloud.google.com/dataplex/docs/quotas)
+
+### API Request Limits
+
+| API Operation | Limit | Scope |
+|---------------|-------|-------|
+| **Entry Read Requests** | 6,000/minute | Per project, per region |
+| **Entry Write Requests** | 1,500/minute | Per project, per region |
+| **Search Requests** | 1,200/minute | Per project |
+| **Search Requests** | 2,400/minute | Per organization |
+
+### Terraform Module Limits
+
+**This module has NO hardcoded limits** - it uses dynamic `for_each` loops:
+
+```hcl
+# Example: Creates as many zones as you provide
+resource "google_dataplex_zone" "zones" {
+  for_each = local.zones_map  # No limit in code
+  # ... configuration ...
+}
+
+# Example: Creates as many assets as you need
+resource "google_dataplex_asset" "gcs_assets" {
+  for_each = {
+    for k, v in local.zones_map : k => v
+    if ... conditions ...
+  }  # No limit in code
+}
+```
+
+**Limits are determined by:**
+- ✅ GCP Dataplex quotas (check Console)
+- ✅ BigQuery quotas (for BigQuery datasets)
+- ✅ Cloud Storage quotas (for GCS buckets)
+- ❌ NOT by this Terraform module
+
+### How to Check Your Quotas
+
+**Via GCP Console:**
+```
+1. Navigate to: IAM & Admin > Quotas & System Limits
+2. Filter by: "Dataplex"
+3. View current usage and limits for your project
+```
+
+**Via gcloud CLI:**
+```bash
+gcloud compute project-info describe --project=YOUR_PROJECT_ID
+```
+
+### Request Quota Increases
+
+If you need higher limits:
+
+1. **Navigate to Quotas page:**
+   ```
+   https://console.cloud.google.com/iam-admin/quotas?project=YOUR_PROJECT_ID
+   ```
+
+2. **Filter for Dataplex quotas**
+
+3. **Select the quota** and click "EDIT QUOTAS"
+
+4. **Submit request** with business justification
+
+**Note:** Quota increase requests typically take 2-3 business days for approval.
+
+### System Limits (Cannot Be Changed)
+
+| Resource | Limit | Type |
+|----------|-------|------|
+| **Aspects per Entry** | 10,000 | System limit |
+| **Entry Size** | 5 MB | System limit |
+| **Entry ID Length** | 4,000 characters | System limit |
+| **Search Results** | 500 items | System limit |
 
 ---
 
