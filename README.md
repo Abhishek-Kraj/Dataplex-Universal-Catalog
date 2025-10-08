@@ -143,7 +143,7 @@ gcloud services enable dataplex.googleapis.com \
   --project=YOUR_PROJECT_ID
 ```
 
-### 2. Basic Usage
+### 2. Complete Example with ALL Features
 
 ```hcl
 module "dataplex" {
@@ -153,48 +153,233 @@ module "dataplex" {
   region     = "us-central1"
   location   = "us-central1"
 
-  # Enable features
+  # Feature toggles
   enable_manage_lakes = true
   enable_metadata     = true
   enable_governance   = true
+  enable_catalog      = true
+  enable_glossaries   = true
+  enable_quality      = true
+  enable_profiling    = true
+  enable_monitoring   = false
+  enable_secure       = false  # ISS Foundation handles IAM
+  enable_process      = false  # ISS Foundation handles Spark
 
-  # Create a lake with zones
-  lakes = [{
-    lake_id      = "analytics-lake"
-    display_name = "Analytics Data Lake"
-
-    zones = [
-      {
-        zone_id          = "raw-zone"
-        type             = "RAW"
-        existing_bucket  = "my-raw-data-bucket"
-      },
-      {
-        zone_id          = "curated-zone"
-        type             = "CURATED"
-        existing_dataset = "my_analytics_dataset"
+  # Lakes with multiple zones
+  lakes = [
+    {
+      lake_id      = "analytics-lake"
+      display_name = "Analytics Data Lake"
+      description  = "Central analytics lake for business intelligence"
+      labels = {
+        environment = "production"
+        team        = "data-engineering"
       }
-    ]
-  }]
 
-  # Add metadata catalog
-  entry_groups = [{
-    entry_group_id = "data-assets"
-    display_name   = "Data Assets"
-  }]
+      zones = [
+        # RAW zone with GCS bucket
+        {
+          zone_id          = "raw-ingestion"
+          type             = "RAW"
+          display_name     = "Raw Data Ingestion"
+          description      = "Landing zone for raw data files"
+          location_type    = "SINGLE_REGION"
+          existing_bucket  = "my-company-raw-data-bucket"
+        },
+        # RAW zone with BigQuery dataset
+        {
+          zone_id          = "raw-structured"
+          type             = "RAW"
+          display_name     = "Raw Structured Data"
+          description      = "Raw data in BigQuery format"
+          location_type    = "SINGLE_REGION"
+          existing_dataset = "raw_data_warehouse"
+        },
+        # CURATED zone with GCS bucket (Parquet files)
+        {
+          zone_id          = "curated-parquet"
+          type             = "CURATED"
+          display_name     = "Curated Parquet Data"
+          description      = "Processed data in Parquet format"
+          location_type    = "SINGLE_REGION"
+          existing_bucket  = "my-company-curated-parquet-bucket"
+        },
+        # CURATED zone with BigQuery dataset
+        {
+          zone_id          = "curated-analytics"
+          type             = "CURATED"
+          display_name     = "Analytics Warehouse"
+          description      = "Curated data for analytics"
+          location_type    = "SINGLE_REGION"
+          existing_dataset = "analytics_warehouse"
+        }
+      ]
+    }
+  ]
 
-  # Add data quality
-  quality_scans = [{
-    scan_id     = "customer-quality"
-    lake_id     = "analytics-lake"
-    data_source = "//bigquery.googleapis.com/projects/my-project/datasets/customers/tables/customer"
+  # Metadata Catalog - Entry Groups
+  entry_groups = [
+    {
+      entry_group_id = "customer-data"
+      display_name   = "Customer Data Assets"
+      description    = "All customer-related data assets"
+    },
+    {
+      entry_group_id = "financial-data"
+      display_name   = "Financial Data Assets"
+      description    = "Financial records and transactions"
+    }
+  ]
 
-    rules = [{
-      rule_type = "NON_NULL"
-      column    = "customer_id"
-      threshold = 1.0
-    }]
-  }]
+  # Metadata Catalog - Entry Types
+  entry_types = [
+    {
+      entry_type_id = "data-asset"
+      display_name  = "Data Asset"
+      description   = "Standard data asset entry type"
+
+      required_aspects = [
+        {
+          aspect_type = "data-quality-aspect"
+        }
+      ]
+    }
+  ]
+
+  # Metadata Catalog - Aspect Types
+  aspect_types = [
+    {
+      aspect_type_id = "data-quality-aspect"
+      display_name   = "Data Quality Metadata"
+      description    = "Quality metrics for data assets"
+
+      metadata_template = {
+        name = "Data Quality"
+        fields = [
+          {
+            field_id     = "quality_score"
+            display_name = "Quality Score"
+            type         = "DOUBLE"
+            is_required  = true
+          },
+          {
+            field_id     = "last_validated"
+            display_name = "Last Validated"
+            type         = "TIMESTAMP"
+            is_required  = false
+          }
+        ]
+      }
+    }
+  ]
+
+  # Business Glossaries
+  glossaries = [
+    {
+      glossary_id  = "business-terms"
+      display_name = "Business Glossary"
+      description  = "Standard business terminology"
+
+      terms = [
+        {
+          term_id      = "customer"
+          display_name = "Customer"
+          description  = "An individual or organization that purchases goods or services"
+        },
+        {
+          term_id      = "revenue"
+          display_name = "Revenue"
+          description  = "Total income generated from sales of goods or services"
+        },
+        {
+          term_id      = "churn_rate"
+          display_name = "Churn Rate"
+          description  = "Percentage of customers who stop using our service in a given period"
+        }
+      ]
+    }
+  ]
+
+  # Data Quality Scans
+  quality_scans = [
+    {
+      scan_id      = "customer-quality"
+      lake_id      = "analytics-lake"
+      display_name = "Customer Data Quality"
+      description  = "Validate customer master data quality"
+      data_source  = "//bigquery.googleapis.com/projects/my-project/datasets/analytics_warehouse/tables/customers"
+
+      rules = [
+        {
+          rule_type  = "NON_NULL"
+          column     = "customer_id"
+          threshold  = 1.0
+          dimension  = "COMPLETENESS"
+        },
+        {
+          rule_type  = "UNIQUENESS"
+          column     = "customer_id"
+          threshold  = 1.0
+          dimension  = "UNIQUENESS"
+        },
+        {
+          rule_type  = "REGEX"
+          column     = "email"
+          pattern    = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+          threshold  = 0.95
+          dimension  = "VALIDITY"
+        },
+        {
+          rule_type  = "RANGE"
+          column     = "age"
+          min_value  = 18
+          max_value  = 120
+          threshold  = 0.99
+          dimension  = "VALIDITY"
+        },
+        {
+          rule_type     = "SET_MEMBERSHIP"
+          column        = "status"
+          allowed_values = ["active", "inactive", "pending"]
+          threshold     = 1.0
+          dimension     = "VALIDITY"
+        }
+      ]
+
+      schedule = "0 2 * * *"  # Daily at 2 AM
+    }
+  ]
+
+  # Data Profiling Scans
+  profiling_scans = [
+    {
+      scan_id      = "customer-profile"
+      lake_id      = "analytics-lake"
+      display_name = "Customer Data Profile"
+      description  = "Statistical analysis of customer data"
+      data_source  = "//bigquery.googleapis.com/projects/my-project/datasets/analytics_warehouse/tables/customers"
+      schedule     = "0 3 * * 0"  # Weekly on Sunday at 3 AM
+    }
+  ]
+
+  # IAM Bindings (if enable_secure = true)
+  iam_bindings = [
+    {
+      lake_id = "analytics-lake"
+      role    = "roles/dataplex.viewer"
+      members = [
+        "group:data-analysts@mycompany.com",
+        "serviceAccount:analytics-sa@my-project.iam.gserviceaccount.com"
+      ]
+    }
+  ]
+
+  # Global labels
+  labels = {
+    environment = "production"
+    managed_by  = "terraform"
+    team        = "data-platform"
+  }
 }
 ```
 
