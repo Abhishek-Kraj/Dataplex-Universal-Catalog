@@ -456,7 +456,7 @@ gcloud projects add-iam-policy-binding {PROJECT_ID} \
 
 ## Next Steps
 
-1. Review [ARCHITECTURE.md](../ARCHITECTURE.md) for design principles
-2. Check [examples/basic/README.md](../examples/basic/README.md) for detailed configuration
-3. Test in sandbox environment first (`prusandbx`)
-4. Roll out to production environments
+1. Review [README.md](../README.md) - Complete documentation with architecture and examples
+2. Check [examples/example](../examples/example/) - Working example with all features
+3. Test in sandbox environment first before production deployment
+4. Deploy to production following ISS Foundation workflow
