@@ -1,10 +1,19 @@
 # Dataplex Universal Catalog - Terraform Module
 
+> **📌 ISS Foundation Version** - This branch is optimized for GCP ISS (Infrastructure Self-Service) Foundation integration. For public/standalone version with storage creation, see [`master`](https://github.com/Abhishek-Kraj/Dataplex-Universal-Catalog/tree/master) branch.
+
 **Catalog-only Terraform module for Google Cloud Dataplex** - Organize, catalog, and govern your data across GCS buckets and BigQuery datasets.
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Terraform](https://img.shields.io/badge/Terraform-1.3+-purple.svg)](https://www.terraform.io)
 [![Google Provider](https://img.shields.io/badge/Google%20Provider-5.0+-blue.svg)](https://registry.terraform.io/providers/hashicorp/google/latest)
+
+## 📦 Version Selection
+
+| Version | Branch | Use Case | Storage Creation |
+|---------|--------|----------|------------------|
+| **ISS Foundation** | [`feature/iss-foundation`](https://github.com/Abhishek-Kraj/Dataplex-Universal-Catalog/tree/feature/iss-foundation) | GCP ISS Foundation users | ❌ Catalog only (references existing) |
+| **Public/Standalone** | [`master`](https://github.com/Abhishek-Kraj/Dataplex-Universal-Catalog/tree/master) | Standalone Terraform users | ✅ Can create buckets/datasets |
 
 ---
 
