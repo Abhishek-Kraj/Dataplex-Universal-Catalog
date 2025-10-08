@@ -34,21 +34,18 @@ module "dataplex" {
           zone_id         = "claims-raw-zone"
           type            = "RAW"
           existing_bucket = "acrwe-claims-data-lake"
-          create_storage  = false
         },
         # RAW Zone 2: Policy Data
         {
           zone_id         = "policy-raw-zone"
           type            = "RAW"
           existing_bucket = "acrwe-policy-data-warehouse"
-          create_storage  = false
         },
         # RAW Zone 3: Customer Analytics (GCS)
         {
           zone_id         = "customer-raw-zone"
           type            = "RAW"
           existing_bucket = "acrwe-customer-analytics"
-          create_storage  = false
         },
         # RAW Zone 4: Test RAW zone with BigQuery dataset (NEW FEATURE)
         {
@@ -56,42 +53,36 @@ module "dataplex" {
           type             = "RAW"
           display_name     = "RAW Zone with BigQuery Dataset"
           existing_dataset = "acrwe_analytics_warehouse"
-          create_storage   = false
         },
         # CURATED Zone 1: Claims Analytics
         {
           zone_id          = "claims-analytics-zone"
           type             = "CURATED"
           existing_dataset = "acrwe_claims_analytics"
-          create_storage   = false
         },
         # CURATED Zone 2: Policy Underwriting
         {
           zone_id          = "policy-underwriting-zone"
           type             = "CURATED"
           existing_dataset = "acrwe_policy_underwriting"
-          create_storage   = false
         },
         # CURATED Zone 3: Customer Insights
         {
           zone_id          = "customer-insights-zone"
           type             = "CURATED"
           existing_dataset = "acrwe_customer_insights"
-          create_storage   = false
         },
         # CURATED Zone 4: Analytics Warehouse
         {
           zone_id          = "analytics-warehouse-zone"
           type             = "CURATED"
           existing_dataset = "acrwe_analytics_warehouse"
-          create_storage   = false
         },
         # CURATED Zone 5: ML Feature Store
         {
           zone_id          = "ml-feature-store-zone"
           type             = "CURATED"
           existing_dataset = "acrwe_ml_feature_store"
-          create_storage   = false
         },
         # CURATED Zone 6: Test CURATED zone with GCS bucket (NEW FEATURE)
         {
@@ -99,7 +90,6 @@ module "dataplex" {
           type            = "CURATED"
           display_name    = "CURATED Zone with GCS Bucket (Parquet)"
           existing_bucket = "acrwe-policy-data-warehouse"
-          create_storage  = false
         }
       ]
     }

@@ -153,14 +153,12 @@ dataplex_lakes = {
             type             = "RAW"
             display_name     = "Claims Raw Data"
             existing_bucket  = "${LBU}-${ENV}-${STAGE}-${APPREF}-${AZ}-claims-raw-data"
-            create_storage   = false  # Don't create - use existing
           },
           {
             zone_id          = "policy-raw"
             type             = "RAW"
             display_name     = "Policy Data Warehouse"
             existing_bucket  = "${LBU}-${ENV}-${STAGE}-${APPREF}-${AZ}-policy-data-warehouse"
-            create_storage   = false
           },
 
           # CURATED zones - link to existing BigQuery datasets
@@ -169,14 +167,12 @@ dataplex_lakes = {
             type             = "CURATED"
             display_name     = "Claims Analytics"
             existing_dataset = "claims_analytics"
-            create_storage   = false  # Don't create - use existing
           },
           {
             zone_id          = "policy-underwriting"
             type             = "CURATED"
             display_name     = "Policy Underwriting"
             existing_dataset = "policy_underwriting"
-            create_storage   = false
           }
         ]
       }

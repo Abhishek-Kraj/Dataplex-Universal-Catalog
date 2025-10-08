@@ -90,14 +90,9 @@ variable "lakes" {
       display_name  = optional(string)
       description   = optional(string)
       location_type = optional(string, "SINGLE_REGION")
-      # Support for existing resources
-      existing_bucket  = optional(string)     # For RAW zones - name of existing GCS bucket
-      existing_dataset = optional(string)     # For CURATED zones - ID of existing BigQuery dataset
-      create_storage   = optional(bool, true) # Set to false to use existing resources
-
-      # Custom names for new resources (only used when create_storage = true)
-      bucket_name = optional(string) # Custom GCS bucket name (default: "${project_id}-${lake_id}-${zone_id}")
-      dataset_id  = optional(string) # Custom BigQuery dataset ID (default: "${lake_id}_${zone_id}")
+      # Reference existing storage resources (created by infrastructure modules)
+      existing_bucket  = optional(string) # Name of existing GCS bucket
+      existing_dataset = optional(string) # ID of existing BigQuery dataset
     })), [])
   }))
   default = []

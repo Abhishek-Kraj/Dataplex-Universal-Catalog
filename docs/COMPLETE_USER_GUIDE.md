@@ -206,14 +206,12 @@ module "dataplex" {
           type             = "RAW"
           display_name     = "Raw Data Zone"
           existing_bucket  = "my-project-raw-data"  # Your bucket name
-          create_storage   = false
         },
         {
           zone_id          = "curated-zone"
           type             = "CURATED"
           display_name     = "Analytics Zone"
           existing_dataset = "my_analytics_dataset"  # Your dataset ID
-          create_storage   = false
         }
       ]
     }
@@ -471,7 +469,6 @@ module "dataplex" {
           zone_id          = "raw-ingestion"
           type             = "RAW"
           existing_bucket  = "my-existing-bucket-name"  # ← Your bucket
-          create_storage   = false                       # ← Don't create new
         },
 
         # Link to existing BigQuery dataset
@@ -479,7 +476,6 @@ module "dataplex" {
           zone_id          = "analytics-warehouse"
           type             = "CURATED"
           existing_dataset = "my_existing_dataset"       # ← Your dataset
-          create_storage   = false                       # ← Don't create new
         }
       ]
     }
@@ -519,7 +515,6 @@ module "dataplex" {
         {
           zone_id        = "bronze-zone"
           type           = "RAW"
-          create_storage = true                              # ← Create new
           bucket_name    = "my-company-bronze-data-bucket"   # ← Optional custom name
         },
 
@@ -527,7 +522,6 @@ module "dataplex" {
         {
           zone_id        = "silver-zone"
           type           = "CURATED"
-          create_storage = true                              # ← Create new
           dataset_id     = "my_silver_dataset"               # ← Optional custom ID
         }
       ]
@@ -558,14 +552,12 @@ lakes = [
         zone_id          = "existing-raw"
         type             = "RAW"
         existing_bucket  = "legacy-data-bucket"
-        create_storage   = false
       },
 
       # Create new bucket
       {
         zone_id        = "new-raw"
         type           = "RAW"
-        create_storage = true
       },
 
       # Use existing dataset
@@ -573,14 +565,12 @@ lakes = [
         zone_id          = "existing-analytics"
         type             = "CURATED"
         existing_dataset = "legacy_analytics"
-        create_storage   = false
       },
 
       # Create new dataset
       {
         zone_id        = "new-analytics"
         type           = "CURATED"
-        create_storage = true
       }
     ]
   }
@@ -725,21 +715,18 @@ module "ecommerce_catalog" {
           type             = "RAW"
           display_name     = "Raw Orders Data"
           existing_bucket  = "ecommerce-orders-raw"
-          create_storage   = false
         },
         {
           zone_id          = "products-raw"
           type             = "RAW"
           display_name     = "Raw Products Data"
           existing_bucket  = "ecommerce-products-raw"
-          create_storage   = false
         },
         {
           zone_id          = "analytics-warehouse"
           type             = "CURATED"
           display_name     = "Analytics Warehouse"
           existing_dataset = "ecommerce_analytics"
-          create_storage   = false
         }
       ]
     }
@@ -852,13 +839,11 @@ module "financial_catalog" {
           zone_id          = "transactions-raw"
           type             = "RAW"
           existing_bucket  = "finance-transactions-raw"
-          create_storage   = false
         },
         {
           zone_id          = "transactions-processed"
           type             = "CURATED"
           existing_dataset = "transactions_warehouse"
-          create_storage   = false
         }
       ]
     },
@@ -873,13 +858,11 @@ module "financial_catalog" {
           zone_id          = "customer-raw"
           type             = "RAW"
           existing_bucket  = "finance-customers-raw"
-          create_storage   = false
         },
         {
           zone_id          = "customer-analytics"
           type             = "CURATED"
           existing_dataset = "customer_analytics"
-          create_storage   = false
         }
       ]
     },
@@ -894,7 +877,6 @@ module "financial_catalog" {
           zone_id          = "risk-models"
           type             = "CURATED"
           existing_dataset = "risk_models"
-          create_storage   = false
         }
       ]
     }
@@ -1058,28 +1040,24 @@ module "healthcare_catalog" {
           type             = "RAW"
           display_name     = "Electronic Health Records (Raw)"
           existing_bucket  = "healthcare-ehr-raw"
-          create_storage   = false
         },
         {
           zone_id          = "claims-raw"
           type             = "RAW"
           display_name     = "Insurance Claims (Raw)"
           existing_bucket  = "healthcare-claims-raw"
-          create_storage   = false
         },
         {
           zone_id          = "patient-analytics"
           type             = "CURATED"
           display_name     = "Patient Analytics Warehouse"
           existing_dataset = "patient_analytics"
-          create_storage   = false
         },
         {
           zone_id          = "clinical-analytics"
           type             = "CURATED"
           display_name     = "Clinical Analytics"
           existing_dataset = "clinical_analytics"
-          create_storage   = false
         }
       ]
     }
@@ -1228,13 +1206,11 @@ lakes = [
         zone_id          = "bucket-1-zone"
         type             = "RAW"
         existing_bucket  = "legacy-bucket-1"
-        create_storage   = false
       },
       {
         zone_id          = "bucket-2-zone"
         type             = "RAW"
         existing_bucket  = "legacy-bucket-2"
-        create_storage   = false
       },
       # ... repeat for all 50 buckets
 
@@ -1243,7 +1219,6 @@ lakes = [
         zone_id          = "dataset-1-zone"
         type             = "CURATED"
         existing_dataset = "legacy_dataset_1"
-        create_storage   = false
       },
       # ... repeat for all 20 datasets
     ]

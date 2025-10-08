@@ -41,28 +41,12 @@ locals {
         location_type    = zone.location_type
         existing_bucket  = zone.existing_bucket
         existing_dataset = zone.existing_dataset
-        create_storage   = coalesce(zone.create_storage, true)
-        # Custom names for new resources
-        bucket_name = zone.bucket_name
-        dataset_id  = zone.dataset_id
       }
     ]
   ]) : []
 
   zones_map = {
     for zone in local.zones : "${zone.lake_id}-${zone.zone_id}" => zone
-  }
-
-  # Zones that need new storage created
-  zones_needing_storage = {
-    for k, v in local.zones_map : k => v
-    if v.create_storage == true
-  }
-
-  # Zones using existing storage
-  zones_using_existing = {
-    for k, v in local.zones_map : k => v
-    if v.create_storage == false
   }
 }
 
@@ -95,94 +79,15 @@ resource "google_dataplex_zone" "zones" {
   )
 }
 
-# Data source for existing GCS buckets (RAW zones)
-data "google_storage_bucket" "existing_raw_buckets" {
-  for_each = {
-    for k, v in local.zones_using_existing : k => v
-    if v.type == "RAW" && v.existing_bucket != null
-  }
-
-  name = each.value.existing_bucket
-}
-
-# Create GCS bucket for RAW zones (only if create_storage = true)
-resource "google_storage_bucket" "raw_zone_bucket" {
-  for_each = {
-    for k, v in local.zones_needing_storage : k => v
-    if v.type == "RAW"
-  }
-
-  name     = coalesce(each.value.bucket_name, "${var.project_id}-${each.value.lake_id}-${each.value.zone_id}")
-  location = var.location
-  project  = var.project_id
-
-  uniform_bucket_level_access = true
-  public_access_prevention    = "enforced"
-
-  versioning {
-    enabled = true
-  }
-
-  lifecycle_rule {
-    condition {
-      age = 30
-    }
-    action {
-      type = "Delete"
-    }
-  }
-
-  labels = merge(
-    var.labels,
-    {
-      module    = "manage-lakes"
-      zone_type = "raw"
-      lake_id   = each.value.lake_id
-    }
-  )
-}
-
-# Data source for existing BigQuery datasets (CURATED zones)
-data "google_bigquery_dataset" "existing_curated_datasets" {
-  for_each = {
-    for k, v in local.zones_using_existing : k => v
-    if v.type == "CURATED" && v.existing_dataset != null
-  }
-
-  dataset_id = each.value.existing_dataset
-  project    = var.project_id
-}
-
-# Create BigQuery dataset for CURATED zones (only if create_storage = true)
-resource "google_bigquery_dataset" "curated_zone_dataset" {
-  for_each = {
-    for k, v in local.zones_needing_storage : k => v
-    if v.type == "CURATED"
-  }
-
-  dataset_id  = coalesce(each.value.dataset_id, replace("${each.value.lake_id}_${each.value.zone_id}", "-", "_"))
-  project     = var.project_id
-  location    = var.location
-  description = "Curated zone dataset for ${each.value.lake_id}"
-
-  labels = merge(
-    var.labels,
-    {
-      module    = "manage-lakes"
-      zone_type = "curated"
-      lake_id   = each.value.lake_id
-    }
-  )
-
-  delete_contents_on_destroy = false
-}
+# Note: This module only catalogs EXISTING storage resources.
+# Storage resources (GCS buckets, BigQuery datasets) should be created
+# by dedicated infrastructure modules (e.g., builtin_gcs_v2.tf, builtin_bigquery.tf in ISS Foundation)
 
 # Create Dataplex Assets for GCS buckets (any zone type)
 resource "google_dataplex_asset" "gcs_assets" {
   for_each = {
     for k, v in local.zones_map : k => v
-    # Create GCS asset if user provided bucket (either new or existing)
-    if(v.create_storage && v.existing_dataset == null && v.dataset_id == null) || (!v.create_storage && v.existing_bucket != null)
+    if v.existing_bucket != null
   }
 
   name          = replace("${each.value.lake_id}-${each.value.zone_id}-asset", "_", "-")
@@ -193,11 +98,7 @@ resource "google_dataplex_asset" "gcs_assets" {
   description   = "GCS bucket asset for ${each.value.type} zone ${each.value.zone_id}"
 
   resource_spec {
-    name = each.value.create_storage ? (
-      "projects/${var.project_id}/buckets/${google_storage_bucket.raw_zone_bucket[each.key].name}"
-      ) : (
-      "projects/${var.project_id}/buckets/${each.value.existing_bucket}"
-    )
+    name = "projects/${var.project_id}/buckets/${each.value.existing_bucket}"
     type = "STORAGE_BUCKET"
   }
 
@@ -220,8 +121,7 @@ resource "google_dataplex_asset" "gcs_assets" {
 resource "google_dataplex_asset" "bigquery_assets" {
   for_each = {
     for k, v in local.zones_map : k => v
-    # Create BQ asset if user provided dataset (either new or existing)
-    if(v.create_storage && v.existing_bucket == null && v.bucket_name == null) || (!v.create_storage && v.existing_dataset != null)
+    if v.existing_dataset != null
   }
 
   name          = replace("${each.value.lake_id}-${each.value.zone_id}-asset", "_", "-")
@@ -232,11 +132,7 @@ resource "google_dataplex_asset" "bigquery_assets" {
   description   = "BigQuery dataset asset for ${each.value.type} zone ${each.value.zone_id}"
 
   resource_spec {
-    name = each.value.create_storage ? (
-      "projects/${var.project_id}/datasets/${google_bigquery_dataset.curated_zone_dataset[each.key].dataset_id}"
-      ) : (
-      "projects/${var.project_id}/datasets/${each.value.existing_dataset}"
-    )
+    name = "projects/${var.project_id}/datasets/${each.value.existing_dataset}"
     type = "BIGQUERY_DATASET"
   }
 
