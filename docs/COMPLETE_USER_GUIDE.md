@@ -308,8 +308,45 @@ You should see:
 
 ## Understanding Dataplex Concepts
 
-### Core Components
+### Visual Architecture Resources
 
+For official Google Cloud Dataplex architecture diagrams and icons:
+- **[Official GCP Icons Library](https://cloud.google.com/icons)** - Download Dataplex icons (SVG/PNG) for creating diagrams
+- **[Official Icons PowerPoint](https://cloud.google.com/icons/files/google-cloud-platform-official-icons-and-sample-diagrams.pptx)** - Complete icon set with sample diagrams
+- **[Build a Data Mesh Guide](https://cloud.google.com/dataplex/docs/build-a-data-mesh)** - Architecture patterns and best practices
+
+**Note:** Google Cloud icons may be used freely to accurately reference Google's technology and tools.
+
+### Core Components Architecture
+
+```mermaid
+graph TB
+    subgraph Lake["🏞️ Data Lake (Organizational Unit)"]
+        subgraph RawZone["📦 RAW Zone - Unprocessed Data"]
+            RawGCS["Asset: GCS Bucket<br/>(Any format)"]
+            RawBQ["Asset: BigQuery Dataset<br/>(Any data)"]
+        end
+        subgraph CuratedZone["✨ CURATED Zone - Processed Data"]
+            CuratedGCS["Asset: GCS Bucket<br/>(Parquet/Avro/ORC only)"]
+            CuratedBQ["Asset: BigQuery Dataset<br/>(Must have schema)"]
+        end
+    end
+
+    RawZone --> |"No restrictions"| RawGCS
+    RawZone --> |"No restrictions"| RawBQ
+    CuratedZone --> |"Structured formats only"| CuratedGCS
+    CuratedZone --> |"Schema required"| CuratedBQ
+
+    style Lake fill:#e3f2fd
+    style RawZone fill:#fff3e0
+    style CuratedZone fill:#e8f5e9
+    style RawGCS fill:#ffecb3
+    style RawBQ fill:#ffecb3
+    style CuratedGCS fill:#c8e6c9
+    style CuratedBQ fill:#c8e6c9
+```
+
+**ASCII Diagram (for terminals/text viewers):**
 ```
 ┌─────────────────────────────────────────────────────┐
 │                     DATA LAKE                        │

@@ -2,6 +2,43 @@
 
 This module makes it easy to create and manage Google Cloud Dataplex resources including lakes, zones, assets, metadata catalog, and data governance.
 
+## Architecture Overview
+
+```mermaid
+graph TB
+    subgraph Lake["🏞️ Dataplex Lake"]
+        subgraph RawZone["📦 RAW Zone"]
+            RawGCS["GCS Bucket Asset"]
+            RawBQ["BigQuery Asset"]
+        end
+        subgraph CuratedZone["✨ CURATED Zone"]
+            CuratedGCS["GCS Bucket Asset"]
+            CuratedBQ["BigQuery Asset"]
+        end
+    end
+
+    Catalog["📚 Metadata Catalog<br/>Entry Groups & Types"]
+    Quality["✅ Data Quality Scans"]
+    Profiling["📊 Data Profiling"]
+
+    Lake --> Catalog
+    Lake --> Quality
+    Lake --> Profiling
+
+    style Lake fill:#e3f2fd
+    style RawZone fill:#fff3e0
+    style CuratedZone fill:#e8f5e9
+    style Catalog fill:#f3e5f5
+    style Quality fill:#e8f5e9
+    style Profiling fill:#e1f5fe
+```
+
+**Visual Resources:**
+- [Official GCP Icons](https://cloud.google.com/icons) - Download Dataplex icons for diagrams
+- [Architecture Guide](https://cloud.google.com/dataplex/docs/build-a-data-mesh) - Data mesh patterns
+
+## What This Module Creates
+
 The resources/services/activations that this module will create are:
 
 - Dataplex lakes and zones (RAW and CURATED)
