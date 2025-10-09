@@ -9,7 +9,7 @@
 | Field | Value |
 |-------|-------|
 | **Author** | Data Platform Team |
-| **Status** | 📝 Draft → Under Review → Approved → Implemented |
+| **Status** | Draft - Under Review - Approved - Implemented |
 | **Current State** | **Draft** |
 | **Version** | 1.0 |
 | **Date** | January 8, 2025 |
@@ -29,9 +29,9 @@
 
 | Team | Reviewer | Status | Date | Comments |
 |------|----------|--------|------|----------|
-| **Security** | ___ | ⏳ Pending | ___ | ___ |
-| **Architecture** | ___ | ⏳ Pending | ___ | ___ |
-| **Compliance** | ___ | ⏳ Pending | ___ | ___ |
+| **Security** | ___ | Pending | ___ | ___ |
+| **Architecture** | ___ | Pending | ___ | ___ |
+| **Compliance** | ___ | Pending | ___ | ___ |
 
 ---
 
@@ -58,19 +58,16 @@ This RFC proposes the implementation of **GCP Dataplex Universal Catalog** as a 
 
 ## 1.2. Key Objectives
 
-🎯 **Simplify Data Cataloging** - Automate metadata discovery and indexing for all data assets
-
-🎯 **Enable Data Governance** - Implement quality monitoring, profiling, and business glossaries
-
-🎯 **ISS Foundation Integration** - Seamless integration with existing ISS infrastructure patterns
-
-🎯 **Infrastructure as Code** - 100% Terraform-managed, version-controlled deployment
+- **Simplify Data Cataloging**: Automate metadata discovery and indexing for all data assets
+- **Enable Data Governance**: Implement quality monitoring, profiling, and business glossaries
+- **ISS Foundation Integration**: Seamless integration with existing ISS infrastructure patterns
+- **Infrastructure as Code**: 100% Terraform-managed, version-controlled deployment
 
 ## 1.3. Business Value
 
 | Benefit | Impact | Stakeholder |
 |---------|--------|-------------|
-| **Centralized Data Discovery** | Data analysts can find data 10x faster | Data Analysts, Data Scientists |
+| **Centralized Data Discovery** | Significantly reduces time to locate data assets | Data Analysts, Data Scientists |
 | **Automated Quality Monitoring** | Early detection of data issues, reduce downstream errors | Data Engineers, Data Quality Team |
 | **Compliance & Audit** | Complete audit trail, metadata for regulatory compliance | Compliance Officers, Auditors |
 | **Reduced Operational Overhead** | Serverless, fully-managed (no infrastructure to maintain) | Platform Team, SRE |
@@ -101,7 +98,7 @@ This RFC proposes the implementation of **GCP Dataplex Universal Catalog** as a 
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-**Key Design Principle**: 🚫 **Catalog-Only Pattern** - This module does NOT create storage. It only catalogs existing resources created by ISS Foundation.
+**Key Design Principle**: **Catalog-Only Pattern** - This module does NOT create storage infrastructure. It only catalogs existing resources created by ISS Foundation.
 
 ---
 
@@ -109,37 +106,37 @@ This RFC proposes the implementation of **GCP Dataplex Universal Catalog** as a 
 
 ## 2.1. What is Dataplex?
 
-**Google Cloud Dataplex** is a unified data management platform that helps you:
+**Google Cloud Dataplex** is a unified data management platform that provides:
 
-- 📊 **Organize** data into lakes, zones, and assets
-- 🔍 **Discover** data through searchable metadata catalog
-- ✅ **Govern** data with quality scans and profiling
-- 📖 **Document** data with business glossaries
-- 🔒 **Secure** data with IAM and encryption
+- **Organization**: Structure data into lakes, zones, and assets
+- **Discovery**: Searchable metadata catalog for all data assets
+- **Governance**: Data quality scans and profiling capabilities
+- **Documentation**: Business glossaries and terminology management
+- **Security**: IAM integration and encryption support
 
-**Service Type**: Serverless, fully-managed (no VMs, no infrastructure)
+**Service Type**: Serverless, fully-managed service (no virtual machines or infrastructure to maintain)
 
 ## 2.2. Why Do We Need This?
 
 ### Current State (Without Dataplex)
 
-❌ Data scattered across hundreds of GCS buckets and BigQuery datasets
-❌ No centralized catalog - analysts waste time searching for data
-❌ No automated data quality monitoring - issues discovered too late
-❌ No business glossary - inconsistent data definitions
-❌ Manual metadata management - error-prone and time-consuming
+- Data scattered across hundreds of GCS buckets and BigQuery datasets
+- No centralized catalog - significant time spent locating relevant data
+- No automated data quality monitoring - issues discovered during downstream processing
+- No business glossary - inconsistent data definitions across teams
+- Manual metadata management - error-prone and resource-intensive
 
 ### Future State (With Dataplex)
 
-✅ **Centralized Catalog** - All data assets searchable in one place
-✅ **Automated Discovery** - Metadata indexed automatically
-✅ **Quality Monitoring** - Automated validation, early issue detection
-✅ **Business Glossary** - Consistent terminology across organization
-✅ **Infrastructure as Code** - Terraform-managed, version-controlled
+- **Centralized Catalog**: All data assets searchable in one place
+- **Automated Discovery**: Metadata indexed automatically
+- **Quality Monitoring**: Automated validation with early issue detection
+- **Business Glossary**: Consistent terminology across organization
+- **Infrastructure as Code**: Terraform-managed, version-controlled deployment
 
 ## 2.3. Scope
 
-### In Scope ✅
+### In Scope
 
 - Cataloging existing GCS buckets and BigQuery datasets
 - Data quality scans (5 rule types: NON_NULL, UNIQUENESS, REGEX, RANGE, SET_MEMBERSHIP)
@@ -148,15 +145,15 @@ This RFC proposes the implementation of **GCP Dataplex Universal Catalog** as a 
 - Metadata catalog (entry groups, entry types, aspect types)
 - Integration with ISS Foundation (`builtin_gcs_v2.tf`, `builtin_bigquery.tf`)
 
-### Out of Scope ❌
+### Out of Scope
 
-- Creating GCS buckets (use `builtin_gcs_v2.tf`)
-- Creating BigQuery datasets (use `builtin_bigquery.tf`)
+- Creating GCS buckets (handled by `builtin_gcs_v2.tf`)
+- Creating BigQuery datasets (handled by `builtin_bigquery.tf`)
 - Managing encryption keys (ISS Foundation handles org-wide CMEK)
-- Creating custom service accounts (uses Google-managed SA)
+- Creating custom service accounts (uses Google-managed service account)
 - Spark/Dataproc tasks (`enable_process = false`)
 - Data ingestion or ETL pipelines (use Dataflow, Cloud Data Fusion)
-- Network configuration (Dataplex is serverless)
+- Network configuration (Dataplex is a serverless service)
 
 ## 2.4. Key Terms & Definitions
 
@@ -176,7 +173,7 @@ This RFC proposes the implementation of **GCP Dataplex Universal Catalog** as a 
 
 ## 3.1. User Stories
 
-### 👨‍💻 Developer Persona
+### Developer Persona
 
 **As a Developer**, I want to:
 - Use ISS Foundation framework to deploy Dataplex with Terraform
@@ -184,13 +181,13 @@ This RFC proposes the implementation of **GCP Dataplex Universal Catalog** as a 
 - Have all configuration in version-controlled tfvars files
 
 **Acceptance Criteria**:
-- ✅ Add `dataplex_lakes` block to terraform.tfvars
-- ✅ Run Jenkins pipeline (standard ISS Foundation workflow)
-- ✅ Dataplex resources created automatically
+- Add `dataplex_lakes` block to terraform.tfvars
+- Run Jenkins pipeline (standard ISS Foundation workflow)
+- Dataplex resources created automatically
 
 ---
 
-### 👨‍🔧 Data Engineer Persona
+### Data Engineer Persona
 
 **As a Data Engineer**, I want to:
 - Organize data into logical lakes and zones (RAW vs CURATED)
@@ -198,13 +195,13 @@ This RFC proposes the implementation of **GCP Dataplex Universal Catalog** as a 
 - Ensure all data assets are cataloged for discoverability
 
 **Acceptance Criteria**:
-- ✅ Create multiple lakes for different domains
-- ✅ Create RAW zones for ingestion, CURATED zones for processed data
-- ✅ Automatic metadata discovery (no manual work)
+- Create multiple lakes for different domains
+- Create RAW zones for ingestion, CURATED zones for processed data
+- Automatic metadata discovery (no manual work)
 
 ---
 
-### 👩‍💼 Data Analyst Persona
+### Data Analyst Persona
 
 **As a Data Analyst**, I want to:
 - Search and discover data assets across the organization
@@ -212,13 +209,13 @@ This RFC proposes the implementation of **GCP Dataplex Universal Catalog** as a 
 - Understand data quality and profiling statistics
 
 **Acceptance Criteria**:
-- ✅ Searchable data catalog via GCP Console
-- ✅ Business glossary with term definitions
-- ✅ Quality scores visible for all datasets
+- Searchable data catalog via GCP Console
+- Business glossary with term definitions
+- Quality scores visible for all datasets
 
 ---
 
-### 🔍 Data Quality Engineer Persona
+### Data Quality Engineer Persona
 
 **As a Data Quality Engineer**, I want to:
 - Configure automated quality scans to validate data
@@ -226,13 +223,13 @@ This RFC proposes the implementation of **GCP Dataplex Universal Catalog** as a 
 - Get alerts when data quality issues are detected
 
 **Acceptance Criteria**:
-- ✅ 5 rule types supported (NON_NULL, UNIQUENESS, REGEX, RANGE, SET_MEMBERSHIP)
-- ✅ Scheduled execution (daily/weekly/custom cron)
-- ✅ Results stored in BigQuery for analysis
+- 5 rule types supported (NON_NULL, UNIQUENESS, REGEX, RANGE, SET_MEMBERSHIP)
+- Scheduled execution (daily/weekly/custom cron)
+- Results stored in BigQuery for analysis
 
 ---
 
-### 📋 Compliance Officer Persona
+### Compliance Officer Persona
 
 **As a Compliance Officer**, I want to:
 - Ensure all data assets are properly cataloged
@@ -240,9 +237,9 @@ This RFC proposes the implementation of **GCP Dataplex Universal Catalog** as a 
 - Track who accessed what data (audit logs)
 
 **Acceptance Criteria**:
-- ✅ Complete catalog of all GCS buckets and BigQuery datasets
-- ✅ Metadata includes data classification, owner, sensitivity
-- ✅ Audit logs for all Dataplex operations
+- Complete catalog of all GCS buckets and BigQuery datasets
+- Metadata includes data classification, owner, sensitivity
+- Audit logs for all Dataplex operations
 
 ---
 
@@ -281,9 +278,9 @@ Step 3: Analysts Search:
 ```
 
 **Benefits**:
-- ⏱️ **10x faster** data discovery
-- 🔍 **Searchable** catalog (like Google Search for data)
-- 📈 **Automatic** metadata indexing
+- Improved efficiency (90% time reduction) data discovery
+- **Searchable** catalog (centralized search interface)
+- **Automatic** metadata indexing
 
 ---
 
@@ -357,9 +354,9 @@ quality_scans = [{
 4. Alerts if quality falls below threshold
 
 **Benefits**:
-- 🚨 **Early detection** of data quality issues
-- 📊 **Trend analysis** (quality over time)
-- ⚡ **Automated** (no manual SQL queries)
+- **Early detection** of data quality issues
+- **Trend analysis** (quality over time)
+- **Automated** (no manual SQL queries)
 
 ---
 
@@ -417,9 +414,9 @@ glossaries = [{
 4. Everyone uses same definitions
 
 **Benefits**:
-- 📖 **Single source of truth** for business terms
-- 🤝 **Consistent** understanding across teams
-- 🔍 **Searchable** via Data Catalog
+- **Single source of truth** for business terms
+- **Consistent** understanding across teams
+- **Searchable** via Data Catalog
 
 ---
 
@@ -603,14 +600,14 @@ The module supports all core Dataplex features as documented by Google Cloud:
 **Description**: Retrieve metadata for Google Cloud resources (BigQuery, Cloud SQL, Spanner, Vertex AI, Pub/Sub, Dataform, Dataplex Metastore) and third-party resources for an instant data catalog.
 
 **Supported Resources**:
-- ✅ BigQuery (tables, views, datasets)
-- ✅ Cloud Storage (buckets, objects)
-- ✅ Cloud SQL (databases, tables)
-- ✅ Spanner (databases, tables)
-- ✅ Vertex AI (models, datasets)
-- ✅ Pub/Sub (topics, subscriptions)
-- ✅ Dataform (repositories, workflows)
-- ✅ Dataplex Metastore (catalogs)
+- BigQuery (tables, views, datasets)
+- Cloud Storage (buckets, objects)
+- Cloud SQL (databases, tables)
+- Spanner (databases, tables)
+- Vertex AI (models, datasets)
+- Pub/Sub (topics, subscriptions)
+- Dataform (repositories, workflows)
+- Dataplex Metastore (catalogs)
 
 **ISS Foundation Integration**: Automatically catalogs resources created by `builtin_gcs_v2.tf` and `builtin_bigquery.tf`.
 
@@ -909,7 +906,7 @@ The following diagram shows how Dataplex integrates with ISS Foundation and exis
 
 | Use Case | Without Dataplex | With Dataplex |
 |----------|------------------|---------------|
-| **Finding Data** | Manual search through folders, ask teammates | Search like Google: "customer email" → instant results |
+| **Finding Data** | Manual search through folders, manual inquiry processes | Indexed search with immediate results |
 | **Data Quality** | Discover issues after reports fail | Automated scans catch issues early, alert on failures |
 | **Business Terms** | Each team uses different definitions | Central glossary ensures consistent understanding |
 | **Compliance** | Manual tracking of PII and sensitive data | Automatic classification, complete audit trail |
@@ -922,21 +919,21 @@ The following diagram shows how Dataplex integrates with ISS Foundation and exis
 
 | ID | Requirement | Priority | Status |
 |----|-------------|----------|--------|
-| **FR-1** | Terraform-based deployment (100% IaC) | 🔴 Critical | ✅ Implemented |
-| **FR-2** | Catalog existing GCS buckets (no creation) | 🔴 Critical | ✅ Implemented |
-| **FR-3** | Catalog existing BigQuery datasets (no creation) | 🔴 Critical | ✅ Implemented |
-| **FR-4** | Support RAW zones (any data format) | 🔴 Critical | ✅ Implemented |
-| **FR-5** | Support CURATED zones (structured data only) | 🔴 Critical | ✅ Implemented |
-| **FR-6** | Data quality scans (5 rule types) | 🔴 Critical | ✅ Implemented |
-| **FR-7** | Data profiling scans (statistical analysis) | 🟡 High | ✅ Implemented |
-| **FR-8** | Business glossaries (terms and definitions) | 🟡 High | ✅ Implemented |
-| **FR-9** | Metadata catalog (entry groups, types, aspects) | 🟡 High | ✅ Implemented |
-| **FR-10** | ISS Foundation integration | 🔴 Critical | ✅ Implemented |
-| **FR-11** | Org-wide CMEK encryption (via ISS Foundation) | 🔴 Critical | ✅ Implemented |
-| **FR-12** | Google-managed service account (no custom SAs) | 🔴 Critical | ✅ Implemented |
-| **FR-13** | Scheduled quality scans (cron) | 🟡 High | ✅ Implemented |
-| **FR-14** | IAM bindings at lake level | 🟢 Medium | ✅ Implemented |
-| **FR-15** | Cloud Audit Logs integration | 🔴 Critical | ✅ Automatic |
+| **FR-1** | Terraform-based deployment (100% IaC) | Critical | Implemented |
+| **FR-2** | Catalog existing GCS buckets (no creation) | Critical | Implemented |
+| **FR-3** | Catalog existing BigQuery datasets (no creation) | Critical | Implemented |
+| **FR-4** | Support RAW zones (any data format) | Critical | Implemented |
+| **FR-5** | Support CURATED zones (structured data only) | Critical | Implemented |
+| **FR-6** | Data quality scans (5 rule types) | Critical | Implemented |
+| **FR-7** | Data profiling scans (statistical analysis) | High | Implemented |
+| **FR-8** | Business glossaries (terms and definitions) | High | Implemented |
+| **FR-9** | Metadata catalog (entry groups, types, aspects) | High | Implemented |
+| **FR-10** | ISS Foundation integration | Critical | Implemented |
+| **FR-11** | Org-wide CMEK encryption (via ISS Foundation) | Critical | Implemented |
+| **FR-12** | Google-managed service account (no custom SAs) | Critical | Implemented |
+| **FR-13** | Scheduled quality scans (cron) | High | Implemented |
+| **FR-14** | IAM bindings at lake level | Medium | Implemented |
+| **FR-15** | Cloud Audit Logs integration | Critical | Automatic |
 
 ---
 
@@ -944,16 +941,16 @@ The following diagram shows how Dataplex integrates with ISS Foundation and exis
 
 | ID | Requirement | Target | Status |
 |----|-------------|--------|--------|
-| **NFR-1** | Deployment time | < 5 minutes | ✅ Met |
-| **NFR-2** | Regional availability | All GCP regions | ✅ Met |
-| **NFR-3** | Serverless (no infrastructure to manage) | 100% serverless | ✅ Met |
-| **NFR-4** | Encryption (data at rest) | CMEK (ISS Foundation) | ✅ Met |
-| **NFR-5** | Encryption (data in transit) | TLS 1.2+ | ✅ Met |
-| **NFR-6** | High availability | 99.9% SLA | ✅ Met (Google SLA) |
-| **NFR-7** | Disaster recovery | Regional redundancy | ✅ Met |
-| **NFR-8** | Audit logging | 100% of operations | ✅ Met |
-| **NFR-9** | Cost predictability | Pay-per-use (no fixed cost) | ✅ Met |
-| **NFR-10** | Documentation | Complete README + guides | ✅ Met |
+| **NFR-1** | Deployment time | < 5 minutes | Met |
+| **NFR-2** | Regional availability | All GCP regions | Met |
+| **NFR-3** | Serverless (no infrastructure to manage) | 100% serverless | Met |
+| **NFR-4** | Encryption (data at rest) | CMEK (ISS Foundation) | Met |
+| **NFR-5** | Encryption (data in transit) | TLS 1.2+ | Met |
+| **NFR-6** | High availability | 99.9% SLA | Met (Google SLA) |
+| **NFR-7** | Disaster recovery | Regional redundancy | Met |
+| **NFR-8** | Audit logging | 100% of operations | Met |
+| **NFR-9** | Cost predictability | Pay-per-use (no fixed cost) | Met |
+| **NFR-10** | Documentation | Complete README + guides | Met |
 
 ---
 
@@ -961,14 +958,14 @@ The following diagram shows how Dataplex integrates with ISS Foundation and exis
 
 | ID | Constraint | Impact | Mitigation |
 |----|-----------|--------|------------|
-| **CON-1** | Catalog-only pattern (no storage creation) | Module cannot create buckets/datasets | ✅ Use `builtin_gcs_v2.tf` / `builtin_bigquery.tf` |
-| **CON-2** | Regional service (all resources in same region) | Cannot span multiple regions | ⚠️ Create separate lakes per region |
-| **CON-3** | Quality scans only on BigQuery tables | Cannot scan GCS files directly | ⚠️ Load data to BigQuery for scanning |
-| **CON-4** | CURATED zones require structured data | RAW formats not allowed in CURATED | ✅ Use RAW zones for unstructured data |
-| **CON-5** | Same-project asset cataloging only | Cannot catalog cross-project resources | ⚠️ Deploy module in each project |
-| **CON-6** | No encryption key management | Module cannot create/rotate keys | ✅ ISS Foundation handles CMEK |
-| **CON-7** | Google-managed SA only | No custom service accounts | ✅ Sufficient for cataloging use case |
-| **CON-8** | Glossaries stored as BigQuery tables | Native glossaries not in Terraform yet | ⚠️ Workaround using BQ tables |
+| **CON-1** | Catalog-only pattern (no storage creation) | Module cannot create buckets/datasets | [Mitigation] Use `builtin_gcs_v2.tf` / `builtin_bigquery.tf` |
+| **CON-2** | Regional service (all resources in same region) | Cannot span multiple regions | [Workaround] Create separate lakes per region |
+| **CON-3** | Quality scans only on BigQuery tables | Cannot scan GCS files directly | [Workaround] Load data to BigQuery for scanning |
+| **CON-4** | CURATED zones require structured data | RAW formats not allowed in CURATED | [Mitigation] Use RAW zones for unstructured data |
+| **CON-5** | Same-project asset cataloging only | Cannot catalog cross-project resources | [Workaround] Deploy module in each project |
+| **CON-6** | No encryption key management | Module cannot create/rotate keys | [Mitigation] ISS Foundation handles CMEK |
+| **CON-7** | Google-managed SA only | No custom service accounts | [Mitigation] Sufficient for cataloging use case |
+| **CON-8** | Glossaries stored as BigQuery tables | Native glossaries not in Terraform yet | [Workaround] Workaround using BQ tables |
 
 ---
 
@@ -1234,10 +1231,10 @@ Lake (Top Level)
 | **Glossary Tables (BQ)** | CMEK | Org-wide KMS keyring | ISS Foundation |
 
 **Key Points**:
-- ✅ Dataplex module does NOT create or manage encryption keys
-- ✅ All data encrypted with org-wide CMEK (managed by ISS Foundation)
-- ✅ Automatic key rotation every 90 days
-- ✅ HSM protection level
+- Dataplex module does NOT create or manage encryption keys
+- All data encrypted with org-wide CMEK (managed by ISS Foundation)
+- Automatic key rotation every 90 days
+- HSM protection level
 
 ---
 
@@ -1298,9 +1295,9 @@ Lake (Top Level)
 ```
 
 **Important**:
-- ✅ `roles/dataplex.viewer` does NOT grant access to underlying data (GCS/BigQuery)
-- ✅ Underlying data access controlled separately by GCS/BigQuery IAM
-- ✅ No overly permissive roles (no `roles/owner`, `roles/editor`)
+- `roles/dataplex.viewer` does NOT grant access to underlying data (GCS/BigQuery)
+- Underlying data access controlled separately by GCS/BigQuery IAM
+- No overly permissive roles (no `roles/owner`, `roles/editor`)
 
 ---
 
@@ -1496,7 +1493,7 @@ Terraform Dependency:
 - 🔐 **Org-wide CMEK encryption** managed at organization level
 - 🏷️ **Consistent naming** patterns (`{lbu}-{env}-{stage}-{appref}-{az}-{name}`)
 - 🏛️ **Hierarchical structure** (Level 1: Org → Level 2: Network → Level 3: Runtime)
-- 🔄 **CI/CD pipelines** (Jenkins for automated deployment)
+- **CI/CD pipelines** (Jenkins for automated deployment)
 
 ### How Dataplex Fits In
 
@@ -1614,10 +1611,10 @@ output "dataplex_lakes" {
 ```
 
 **Key Points**:
-- ✅ Use `ref=feature/iss-foundation` branch (catalog-only, no storage creation)
-- ✅ `project_id`, `region`, `location` come from ISS Foundation locals
-- ✅ `enable_secure = false` and `enable_process = false` (ISS Foundation handles)
-- ✅ Labels use ISS Foundation standard: `lbu`, `env`, `stage`, `appref`
+- Use `ref=feature/iss-foundation` branch (catalog-only, no storage creation)
+- `project_id`, `region`, `location` come from ISS Foundation locals
+- `enable_secure = false` and `enable_process = false` (ISS Foundation handles)
+- Labels use ISS Foundation standard: `lbu`, `env`, `stage`, `appref`
 
 ---
 
@@ -1706,7 +1703,7 @@ dataplex_lakes = {
             display_name = "Raw Data Ingestion"
             description  = "Landing zone for raw data files"
 
-            # ⚠️ CRITICAL: Use FULL bucket name as created by ISS Foundation
+            # [Workaround] CRITICAL: Use FULL bucket name as created by ISS Foundation
             # Pattern: ${LBU}-${ENV}-${STAGE}-${APPREF}-${AZ}-{bucket-name}
             # Example: pru-prod-runtime-analytics-az1-raw-data
             existing_bucket = "${LBU}-${ENV}-${STAGE}-${APPREF}-${AZ}-raw-data"
@@ -1721,7 +1718,7 @@ dataplex_lakes = {
             display_name = "Analytics Warehouse"
             description  = "Curated data for analytics and reporting"
 
-            # ⚠️ CRITICAL: Use the EXACT key from bigquery_datasets above
+            # [Workaround] CRITICAL: Use the EXACT key from bigquery_datasets above
             # NOT the full table path, just the dataset key
             existing_dataset = "analytics_warehouse"
           },
@@ -1837,7 +1834,7 @@ dataplex_lakes = {
         display_name = "Customer Data Quality"
         description  = "Validate customer master data quality"
 
-        # ⚠️ CRITICAL: Use full BigQuery table path
+        # [Workaround] CRITICAL: Use full BigQuery table path
         data_source = "//bigquery.googleapis.com/projects/${PROJECT_ID}/datasets/analytics_warehouse/tables/customers"
 
         rules = [
@@ -1911,10 +1908,10 @@ gcs_buckets_v2 = {
 # ============================================================================
 existing_bucket = "${LBU}-${ENV}-${STAGE}-${APPREF}-${AZ}-raw-data"
 
-# ⚠️ WRONG:
+# [Workaround] WRONG:
 existing_bucket = "raw-data"  # Too short!
 
-# ✅ CORRECT:
+# [Mitigation] CORRECT:
 existing_bucket = "pru-prod-runtime-analytics-az1-raw-data"  # Full ISS name
 ```
 
@@ -1933,10 +1930,10 @@ bigquery_datasets = {
 # ============================================================================
 existing_dataset = "analytics_warehouse"  # ← Same as above
 
-# ⚠️ WRONG:
+# [Workaround] WRONG:
 existing_dataset = "projects/PROJECT/datasets/analytics_warehouse"  # Too long!
 
-# ✅ CORRECT:
+# [Mitigation] CORRECT:
 existing_dataset = "analytics_warehouse"  # Just the dataset ID
 ```
 
@@ -2004,11 +2001,11 @@ gcloud dataplex lakes list --project=pru-prod-runtime-analytics-az1 --location=a
 
 | Compliance Framework | Status | Notes |
 |---------------------|--------|-------|
-| **SOC 2 Type II** | ✅ Compliant | Audit logs, encryption, access controls |
-| **ISO 27001** | ✅ Compliant | Information security management |
-| **GDPR** | ✅ Compliant | Encryption, audit trails, right to deletion |
-| **HIPAA** | ⚠️ Conditional | Requires BAA with Google |
-| **PCI-DSS** | ⚠️ Conditional | Module only catalogs metadata |
+| **SOC 2 Type II** | [Mitigation] Compliant | Audit logs, encryption, access controls |
+| **ISO 27001** | [Mitigation] Compliant | Information security management |
+| **GDPR** | [Mitigation] Compliant | Encryption, audit trails, right to deletion |
+| **HIPAA** | [Workaround] Conditional | Requires BAA with Google |
+| **PCI-DSS** | [Workaround] Conditional | Module only catalogs metadata |
 
 ---
 
@@ -2070,10 +2067,10 @@ Compliance:
 ### Phase 1: Preparation (Week 1)
 
 **Objectives**:
-- ✅ Security team reviews RFC and Security Discovery Document
-- ✅ Architecture team reviews technical design
-- ✅ Compliance team reviews compliance requirements
-- ✅ Obtain all necessary approvals
+- Security team reviews RFC and Security Discovery Document
+- Architecture team reviews technical design
+- Compliance team reviews compliance requirements
+- Obtain all necessary approvals
 
 **Deliverables**:
 - Signed approval from Security, Architecture, Compliance teams
@@ -2085,10 +2082,10 @@ Compliance:
 ### Phase 2: Development (Week 2)
 
 **Objectives**:
-- ✅ Add `builtin_dataplex.tf` to ISS Foundation Level 3 runtime
-- ✅ Test in sandbox environment (`prusandbx`)
-- ✅ Create documentation and examples
-- ✅ Validate deployment process
+- Add `builtin_dataplex.tf` to ISS Foundation Level 3 runtime
+- Test in sandbox environment (`prusandbx`)
+- Create documentation and examples
+- Validate deployment process
 
 **Deliverables**:
 - `builtin_dataplex.tf` module added to gcp-foundation repository
@@ -2101,10 +2098,10 @@ Compliance:
 ### Phase 3: Pilot Deployment (Week 3)
 
 **Objectives**:
-- ✅ Deploy to 1-2 pilot projects (non-production)
-- ✅ Validate functionality (cataloging, quality scans, glossaries)
-- ✅ Collect feedback from users (data analysts, engineers)
-- ✅ Refine configuration based on feedback
+- Deploy to 1-2 pilot projects (non-production)
+- Validate functionality (cataloging, quality scans, glossaries)
+- Collect feedback from users (data analysts, engineers)
+- Refine configuration based on feedback
 
 **Deliverables**:
 - Pilot projects deployed successfully
@@ -2117,10 +2114,10 @@ Compliance:
 ### Phase 4: Production Rollout (Week 4-6)
 
 **Objectives**:
-- ✅ Deploy to production projects (phased approach)
-- ✅ Train data analysts and engineers on using Data Catalog
-- ✅ Set up monitoring and alerting
-- ✅ Establish support processes
+- Deploy to production projects (phased approach)
+- Train data analysts and engineers on using Data Catalog
+- Set up monitoring and alerting
+- Establish support processes
 
 **Deliverables**:
 - Production projects deployed
@@ -2133,10 +2130,10 @@ Compliance:
 ### Phase 5: Operationalization (Ongoing)
 
 **Objectives**:
-- ✅ Monitor quality scan results
-- ✅ Continuously improve business glossaries
-- ✅ Expand cataloging to additional projects
-- ✅ Optimize costs and performance
+- Monitor quality scan results
+- Continuously improve business glossaries
+- Expand cataloging to additional projects
+- Optimize costs and performance
 
 **Deliverables**:
 - Regular quality reports
@@ -2639,10 +2636,10 @@ Costs per month:
 # ❌ BAD: Hourly scans (expensive)
 schedule = "0 * * * *"  # 720 scans/month
 
-# ✅ BETTER: Daily scans (24x cheaper)
+# [Mitigation] BETTER: Daily scans (24x cheaper)
 schedule = "0 2 * * *"  # 30 scans/month
 
-# ✅ BEST: Weekly scans for static tables (180x cheaper)
+# [Mitigation] BEST: Weekly scans for static tables (180x cheaper)
 schedule = "0 2 * * 0"  # 4 scans/month
 ```
 
@@ -2656,7 +2653,7 @@ schedule = "0 2 * * 0"  # 4 scans/month
 # ❌ BAD: Scan all columns (expensive)
 # Dataplex scans every column in the table
 
-# ✅ BETTER: Scan only critical columns
+# [Mitigation] BETTER: Scan only critical columns
 quality_scans = [{
   rules = [
     { rule_type = "NON_NULL", column = "customer_id" },      # Critical
@@ -2677,7 +2674,7 @@ quality_scans = [{
 # ❌ BAD: Scan all tables equally
 # Scan both critical production tables and test tables
 
-# ✅ BETTER: Scan only critical production tables
+# [Mitigation] BETTER: Scan only critical production tables
 quality_scans = [
   {
     scan_id = "critical-customer-quality"
@@ -2744,10 +2741,10 @@ bq query --use_legacy_sql=false \
 
 | Benefit | Baseline (without Dataplex) | With Dataplex | Improvement |
 |---------|----------------------------|---------------|-------------|
-| **Data Discovery Time** | 2 hours per analyst per week | 12 minutes | **10x faster** |
+| **Data Discovery Time** | 2 hours per analyst per week | 12 minutes | Improved efficiency (90% time reduction) |
 | **Data Quality Issues Detected** | After reports fail | Before deployment | **Early detection** |
 | **Documentation Coverage** | 20% of data assets | 100% of data assets | **5x improvement** |
-| **Compliance Audit Prep** | 40 hours per quarter | 4 hours per quarter | **10x faster** |
+| **Compliance Audit Prep** | 40 hours per quarter | 4 hours per quarter | Improved efficiency (90% time reduction) |
 
 ### Costs (Annual)
 
@@ -2947,14 +2944,14 @@ Business Owner:
 
 After approval:
 
-1. ✅ **Security team signs off** on security analysis
-2. ✅ **Architecture team signs off** on technical design
-3. ✅ **Compliance team signs off** (if applicable)
-4. ✅ **Schedule implementation** (Weeks 1-6 per Implementation Plan)
-5. ✅ **Deploy to sandbox** for testing
-6. ✅ **Pilot deployment** to 1-2 non-production projects
-7. ✅ **Production rollout** (phased approach)
-8. ✅ **Operationalize** (monitoring, training, support)
+1. [Mitigation] **Security team signs off** on security analysis
+2. [Mitigation] **Architecture team signs off** on technical design
+3. [Mitigation] **Compliance team signs off** (if applicable)
+4. [Mitigation] **Schedule implementation** (Weeks 1-6 per Implementation Plan)
+5. [Mitigation] **Deploy to sandbox** for testing
+6. [Mitigation] **Pilot deployment** to 1-2 non-production projects
+7. [Mitigation] **Production rollout** (phased approach)
+8. [Mitigation] **Operationalize** (monitoring, training, support)
 
 ---
 
