@@ -89,10 +89,10 @@ This RFC proposes the implementation of **GCP Dataplex Universal Catalog** as a 
 │           ┌───────────▼────────────────────────┐               │
 │           │    builtin_dataplex.tf (NEW)       │               │
 │           │                                     │               │
-│           │  ✓ Catalogs existing resources     │               │
-│           │  ✓ Data quality scans              │               │
-│           │  ✓ Business glossaries             │               │
-│           │  ✓ Metadata discovery              │               │
+│           │  - Catalogs existing resources     │               │
+│           │  - Data quality scans              │               │
+│           │  - Business glossaries             │               │
+│           │  - Metadata discovery              │               │
 │           └────────────────────────────────────┘               │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
@@ -711,12 +711,12 @@ The following diagram shows how Dataplex integrates with ISS Foundation and exis
 │           ┌───────────▼────────────────────────┐               │
 │           │    builtin_dataplex.tf (NEW)       │               │
 │           │                                     │               │
-│           │  ✓ Lakes & Zones (organization)    │               │
-│           │  ✓ Assets (catalog existing data)  │               │
-│           │  ✓ Quality Scans (data validation) │               │
-│           │  ✓ Profiling Scans (statistics)    │               │
-│           │  ✓ Glossaries (business terms)     │               │
-│           │  ✓ Entry Groups (metadata org)     │               │
+│           │  - Lakes & Zones (organization)    │               │
+│           │  - Assets (catalog existing data)  │               │
+│           │  - Quality Scans (data validation) │               │
+│           │  - Profiling Scans (statistics)    │               │
+│           │  - Glossaries (business terms)     │               │
+│           │  - Entry Groups (metadata org)     │               │
 │           │                                     │               │
 │           │  Security via ISS Foundation:      │               │
 │           │  • Google-managed service account  │               │
@@ -810,13 +810,13 @@ The following diagram shows how Dataplex integrates with ISS Foundation and exis
 
 ## 3.7. Assumptions
 
-✅ GCP Organization and billing account exist
-✅ ISS Foundation is deployed and operational
-✅ GCS buckets and BigQuery datasets already exist (created by ISS Foundation)
-✅ Org-wide CMEK keys are configured at organization level
-✅ Terraform service account has required permissions
-✅ Network connectivity not needed (Dataplex is serverless)
-✅ Jenkins CI/CD pipeline is available for deployment
+- GCP Organization and billing account exist
+- ISS Foundation is deployed and operational
+- GCS buckets and BigQuery datasets already exist (created by ISS Foundation)
+- Org-wide CMEK keys are configured at organization level
+- Terraform service account has required permissions
+- Network connectivity not needed (Dataplex is serverless)
+- Jenkins CI/CD pipeline is available for deployment
 
 ---
 
