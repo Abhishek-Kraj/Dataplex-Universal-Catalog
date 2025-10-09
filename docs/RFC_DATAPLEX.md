@@ -486,6 +486,501 @@ dataplex_lakes = {
 
 ---
 
+## 3.2.5. Google Cloud Official Use Cases & Features
+
+This section incorporates the official Google Cloud Dataplex use cases and capabilities to provide a complete picture of what Dataplex Universal Catalog can do.
+
+### Official Use Cases
+
+Dataplex Universal Catalog is designed to address the following use cases:
+
+#### 1. Discover and Understand Your Data
+
+**What it does**: Dataplex Universal Catalog provides visibility over your data resources across the organization. It lets you find relevant resources for data consumption needs.
+
+**How it works**:
+- Automatically discovers and catalogs data across GCS, BigQuery, Spanner, Cloud SQL, Pub/Sub, Dataform, and more
+- Provides a unified view of all data assets in one place
+- Enables search and discovery through natural language queries
+- Shows metadata, schema, and lineage information
+
+**ISS Foundation Example**:
+```hcl
+# Catalog all ISS Foundation resources automatically
+dataplex_lakes = {
+  "organization-catalog" : {
+    lakes = [{
+      lake_id     = "enterprise-data-lake"
+      description = "Organization-wide data catalog"
+      zones = [
+        {
+          zone_id         = "gcs-raw-zone"
+          type            = "RAW"
+          existing_bucket = "pru-prod-runtime-analytics-az1-raw-data"
+        },
+        {
+          zone_id          = "bigquery-curated-zone"
+          type             = "CURATED"
+          existing_dataset = "analytics_warehouse"
+        }
+      ]
+    }]
+  }
+}
+```
+
+---
+
+#### 2. Enable Data Governance and Data Management
+
+**What it does**: Dataplex Universal Catalog supplies metadata that can inform and power your data governance and data management capabilities.
+
+**Key Capabilities**:
+- **Metadata Management**: Automatically harvested metadata from Google Cloud resources
+- **Data Classification**: Tag data with sensitivity levels (PII, Confidential, Public)
+- **Access Control**: Integrate with IAM for fine-grained permissions
+- **Audit Trail**: Complete logs of who accessed what data and when
+
+**ISS Foundation Example**:
+```hcl
+# Add metadata tags for governance
+dataplex_lakes = {
+  "governed-catalog" : {
+    lakes = [{
+      lake_id = "compliance-lake"
+      labels = {
+        compliance  = "sox"
+        data_class  = "confidential"
+        department  = "finance"
+      }
+      zones = [{
+        zone_id          = "customer-pii"
+        type             = "CURATED"
+        existing_dataset = "customer_data"
+        # Attach business glossary
+      }]
+    }]
+
+    # Define business glossary
+    glossaries = [{
+      glossary_id = "financial-terms"
+      terms = [
+        {
+          name        = "Revenue"
+          definition  = "Total income generated from sales before expenses"
+          classification = "Financial Metric"
+        },
+        {
+          name        = "Customer"
+          definition  = "Individual or organization that purchases products/services"
+          classification = "Business Entity"
+        }
+      ]
+    }]
+  }
+}
+```
+
+---
+
+#### 3. Create a Central Data Catalog
+
+**What it does**: Dataplex Universal Catalog stores and provides access to metadata that is automatically harvested from your Google Cloud resources. You can integrate your own metadata from non-Google Cloud systems.
+
+**Integration Points**:
+- Google Cloud native resources (BigQuery, GCS, etc.)
+- Third-party metadata via custom entry groups
+- Business metadata (glossaries, annotations)
+- Technical metadata (schema, statistics)
+
+**Architecture**:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                  Integrated Analytics Experience                 │
+│                  Curate | Integrate | Analyze                    │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │
+        ┌───────────────────┼───────────────────┐
+        │                   │                   │
+┌───────▼────────┐  ┌──────▼──────┐  ┌─────────▼────────┐
+│ Data           │  │ Data Lakes  │  │  Data Marts      │
+│ Warehouses     │  │             │  │                  │
+│ (BigQuery)     │  │ (GCS)       │  │  (BigQuery)      │
+└───────┬────────┘  └──────┬──────┘  └─────────┬────────┘
+        │                   │                   │
+        └───────────────────┼───────────────────┘
+                            │
+        ┌───────────────────▼───────────────────────────┐
+        │      Unified Data Management                   │
+        │  Metadata | Intelligence | Lifecycle |         │
+        │  Governance | Security                         │
+        │                                                │
+        │         Dataplex Universal Catalog             │
+        └────────────────────────────────────────────────┘
+```
+
+**ISS Foundation Example**:
+```hcl
+# Create unified catalog with entry groups
+dataplex_lakes = {
+  "central-catalog" : {
+    lakes = [{
+      lake_id     = "enterprise-catalog"
+      description = "Central metadata repository"
+      zones = [
+        { zone_id = "raw-zone", type = "RAW", existing_bucket = "data-raw" },
+        { zone_id = "curated-zone", type = "CURATED", existing_dataset = "data_warehouse" }
+      ]
+    }]
+
+    # Organize metadata into entry groups
+    entry_groups = [{
+      entry_group_id = "customer-data"
+      description    = "All customer-related data assets"
+      entries = [
+        {
+          entry_id    = "customer-profile"
+          entry_type  = "customer_table"
+          description = "Customer profile with PII data"
+        },
+        {
+          entry_id    = "customer-transactions"
+          entry_type  = "transaction_table"
+          description = "Customer purchase history"
+        }
+      ]
+    }]
+  }
+}
+```
+
+---
+
+### Dataplex Universal Catalog Features
+
+The module supports all core Dataplex features as documented by Google Cloud:
+
+#### 1. Metadata Cataloging
+
+**Description**: Retrieve metadata for Google Cloud resources (BigQuery, Cloud SQL, Spanner, Vertex AI, Pub/Sub, Dataform, Dataplex Metastore) and third-party resources for an instant data catalog.
+
+**Supported Resources**:
+- ✅ BigQuery (tables, views, datasets)
+- ✅ Cloud Storage (buckets, objects)
+- ✅ Cloud SQL (databases, tables)
+- ✅ Spanner (databases, tables)
+- ✅ Vertex AI (models, datasets)
+- ✅ Pub/Sub (topics, subscriptions)
+- ✅ Dataform (repositories, workflows)
+- ✅ Dataplex Metastore (catalogs)
+
+**ISS Foundation Integration**: Automatically catalogs resources created by `builtin_gcs_v2.tf` and `builtin_bigquery.tf`.
+
+---
+
+#### 2. Data Discovery
+
+**Description**: Scan for structured and unstructured data in Cloud Storage buckets to extract and catalog their metadata.
+
+**Capabilities**:
+- Automatic schema detection for CSV, JSON, Avro, Parquet, ORC files
+- File format identification
+- Metadata extraction (file size, row count, column types)
+- Incremental scanning (only new/modified files)
+
+**ISS Foundation Example**:
+```hcl
+# Enable discovery scans for raw data zone
+dataplex_lakes = {
+  "discovery-catalog" : {
+    lakes = [{
+      lake_id = "raw-data-lake"
+      zones = [{
+        zone_id         = "raw-files"
+        type            = "RAW"
+        existing_bucket = "pru-prod-runtime-analytics-az1-raw-data"
+
+        # Dataplex automatically discovers:
+        # - CSV files → extracts schema
+        # - JSON files → infers structure
+        # - Parquet files → reads embedded schema
+      }]
+    }]
+  }
+}
+```
+
+---
+
+#### 3. Data Insights
+
+**Description**: Use AI to generate natural language questions about your data, to uncover patterns, assess data quality, and perform statistical analyses.
+
+**Capabilities**:
+- Natural language queries (e.g., "Show me tables with customer email")
+- AI-powered pattern detection
+- Statistical analysis (min, max, avg, percentiles)
+- Null count and unique value analysis
+
+**Example Queries**:
+```
+• "Find all tables with PII data"
+• "Show me datasets modified in the last 7 days"
+• "What tables have the most null values?"
+• "Which datasets are largest by size?"
+```
+
+---
+
+#### 4. Data Profiling
+
+**Description**: Identify, classify, and review common characteristics of column values (typical data values, data distribution, null counts, etc.) in BigQuery tables.
+
+**What it measures**:
+- Data distribution (min, max, mean, median, percentiles)
+- Null counts and null percentages
+- Unique value counts
+- String length statistics
+- Numeric range and distribution
+
+**ISS Foundation Example**:
+```hcl
+# Profile customer data for statistical insights
+dataplex_lakes = {
+  "profiled-catalog" : {
+    profiling_scans = [{
+      scan_id     = "customer-profile-scan"
+      data_source = "//bigquery.googleapis.com/projects/PROJECT/datasets/customer_data/tables/customers"
+      schedule    = "0 0 * * 0"  # Weekly on Sunday
+
+      # Results show:
+      # - customer_id: 100% non-null, 1M unique values
+      # - email: 98% non-null, 15% duplicates
+      # - age: min=18, max=95, mean=42.5, p50=41
+    }]
+  }
+}
+```
+
+---
+
+#### 5. Data Quality
+
+**Description**: Define and measure the quality of the data in your BigQuery tables, by validating data against organizational policies and logging alerts if data doesn't meet quality criteria.
+
+**Supported Rules**:
+- **NON_NULL**: Column must not have null values
+- **UNIQUENESS**: Column must have unique values (no duplicates)
+- **REGEX**: String must match regex pattern (e.g., email format)
+- **RANGE**: Numeric value must be within min/max range
+- **SET_MEMBERSHIP**: Value must be in predefined set (e.g., status IN ['active', 'pending', 'closed'])
+
+**ISS Foundation Example**:
+```hcl
+# Enforce data quality rules
+dataplex_lakes = {
+  "quality-catalog" : {
+    quality_scans = [{
+      scan_id     = "customer-quality-scan"
+      data_source = "//bigquery.googleapis.com/projects/PROJECT/datasets/customer_data/tables/customers"
+      schedule    = "0 */6 * * *"  # Every 6 hours
+
+      rules = [
+        {
+          rule_type = "NON_NULL"
+          column    = "customer_id"
+          threshold = 1.0  # 100% must be non-null
+        },
+        {
+          rule_type = "UNIQUENESS"
+          column    = "email"
+          threshold = 0.99  # 99% must be unique
+        },
+        {
+          rule_type = "REGEX"
+          column    = "email"
+          regex     = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+          threshold = 0.95
+        },
+        {
+          rule_type = "RANGE"
+          column    = "age"
+          min_value = 18
+          max_value = 120
+          threshold = 1.0
+        },
+        {
+          rule_type      = "SET_MEMBERSHIP"
+          column         = "status"
+          allowed_values = ["active", "pending", "suspended", "closed"]
+          threshold      = 1.0
+        }
+      ]
+    }]
+  }
+}
+```
+
+---
+
+#### 6. Business Glossary
+
+**Description**: Manage business-related terminology and definitions across your organization and attach terms to table columns to promote a consistent understanding of data usage.
+
+**Capabilities**:
+- Define business terms with clear definitions
+- Attach terms to BigQuery columns
+- Classify terms by category
+- Search and discover business vocabulary
+- Enforce consistent terminology
+
+**ISS Foundation Example**:
+```hcl
+# Create business glossary for data governance
+dataplex_lakes = {
+  "governed-catalog" : {
+    glossaries = [{
+      glossary_id = "business-terms"
+      description = "Enterprise-wide business vocabulary"
+
+      terms = [
+        {
+          name           = "Customer"
+          definition     = "An individual or organization that purchases products or services from the company"
+          classification = "Business Entity"
+        },
+        {
+          name           = "Revenue"
+          definition     = "Total income generated from sales of goods or services before deducting expenses"
+          classification = "Financial Metric"
+        },
+        {
+          name           = "Churn"
+          definition     = "The percentage of customers who stop using the product during a given time period"
+          classification = "Business Metric"
+        },
+        {
+          name           = "PII"
+          definition     = "Personally Identifiable Information - data that can identify a specific individual"
+          classification = "Data Classification"
+        },
+        {
+          name           = "ARR"
+          definition     = "Annual Recurring Revenue - predictable revenue expected over the next 12 months"
+          classification = "Financial Metric"
+        }
+      ]
+    }]
+  }
+}
+```
+
+---
+
+#### 7. Data Lineage
+
+**Description**: Track how data moves through your systems: where it comes from, where it is passed to, and what transformations are applied to it.
+
+**Capabilities**:
+- Automatic lineage for BigQuery (queries, views, scheduled queries)
+- Manual lineage via API for custom transformations
+- Visual lineage graphs in GCP Console
+- Impact analysis (upstream/downstream dependencies)
+
+**Example Lineage Flow**:
+```
+Cloud SQL (PostgreSQL)
+    │
+    │ (Datastream CDC)
+    ▼
+BigQuery Raw Dataset
+    │
+    │ (dbt transformation)
+    ▼
+BigQuery Curated Dataset
+    │
+    │ (Scheduled query)
+    ▼
+BigQuery Analytics Views
+    │
+    │ (Looker dashboard)
+    ▼
+Business Reports
+```
+
+**ISS Foundation**: Lineage is automatically captured for all BigQuery operations. No configuration needed.
+
+---
+
+### Visual Overview: Dataplex Architecture
+
+The following diagram shows how Dataplex integrates with ISS Foundation and existing data infrastructure:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     ISS Foundation (Level 3 Runtime)             │
+│                                                                  │
+│  ┌──────────────────┐        ┌──────────────────┐              │
+│  │ builtin_gcs_v2.tf│        │builtin_bigquery  │              │
+│  │                  │        │                  │              │
+│  │ • Creates Buckets│        │ • Creates        │              │
+│  │ • Applies CMEK   │        │   Datasets       │              │
+│  │ • Sets IAM       │        │ • Applies CMEK   │              │
+│  │                  │        │ • Sets IAM       │              │
+│  └────────┬─────────┘        └────────┬─────────┘              │
+│           │                           │                         │
+│           │  References existing      │                         │
+│           │  resources (no recreation)│                         │
+│           │                           │                         │
+│           └───────────┬───────────────┘                         │
+│                       │                                         │
+│           ┌───────────▼────────────────────────┐               │
+│           │    builtin_dataplex.tf (NEW)       │               │
+│           │                                     │               │
+│           │  ✓ Lakes & Zones (organization)    │               │
+│           │  ✓ Assets (catalog existing data)  │               │
+│           │  ✓ Quality Scans (data validation) │               │
+│           │  ✓ Profiling Scans (statistics)    │               │
+│           │  ✓ Glossaries (business terms)     │               │
+│           │  ✓ Entry Groups (metadata org)     │               │
+│           │                                     │               │
+│           │  Security via ISS Foundation:      │               │
+│           │  • Google-managed service account  │               │
+│           │  • Org-wide CMEK (automatic)       │               │
+│           │  • No custom IAM                   │               │
+│           └────────────────────────────────────┘               │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+                            │
+                            │ Metadata flows to
+                            ▼
+        ┌────────────────────────────────────┐
+        │    GCP Console - Data Catalog UI   │
+        │                                    │
+        │  • Search for datasets/tables      │
+        │  • View quality scores             │
+        │  • See lineage graphs              │
+        │  • Browse business glossary        │
+        │  • Check profiling statistics      │
+        └────────────────────────────────────┘
+```
+
+---
+
+### Summary: Why Use Dataplex Universal Catalog?
+
+| Use Case | Without Dataplex | With Dataplex |
+|----------|------------------|---------------|
+| **Finding Data** | Manual search through folders, ask teammates | Search like Google: "customer email" → instant results |
+| **Data Quality** | Discover issues after reports fail | Automated scans catch issues early, alert on failures |
+| **Business Terms** | Each team uses different definitions | Central glossary ensures consistent understanding |
+| **Compliance** | Manual tracking of PII and sensitive data | Automatic classification, complete audit trail |
+| **Metadata** | Scattered in documentation, tribal knowledge | Centralized, searchable, always up-to-date |
+| **Integration** | Build custom solutions | Native integration with BigQuery, GCS, etc. |
+
+---
+
 ## 3.3. Functional Requirements
 
 | ID | Requirement | Priority | Status |
