@@ -104,7 +104,17 @@ This RFC proposes the implementation of **GCP Dataplex Universal Catalog** as a 
 
 # 2. Introduction
 
-## 2.1. What is Dataplex?
+## 2.1. Document Purpose
+
+| Field | Description |
+|-------|-------------|
+| **Purpose** | To describe deployment process of GCP Dataplex Universal Catalog resources through infrastructure as code (IaC) using the Terraform Resources from the Google Cloud provider. |
+| **Intended Audience** | Security team, Cloud architects, DevOps engineers with familiarity of data governance, security controls, IAM, and Terraform on Google Cloud. |
+| **Key Assumptions** | The audience should have understanding of data governance, GCP security model, Terraform IaC, and enterprise compliance requirements. |
+
+---
+
+## 2.2. What is Dataplex?
 
 **Google Cloud Dataplex** is a unified data management platform that provides:
 
@@ -116,7 +126,7 @@ This RFC proposes the implementation of **GCP Dataplex Universal Catalog** as a 
 
 **Service Type**: Serverless, fully-managed service (no virtual machines or infrastructure to maintain)
 
-## 2.2. Why Do We Need This?
+## 2.3. Why Do We Need This?
 
 ### Current State (Without Dataplex)
 
@@ -134,7 +144,7 @@ This RFC proposes the implementation of **GCP Dataplex Universal Catalog** as a 
 - **Business Glossary**: Consistent terminology across organization
 - **Infrastructure as Code**: Terraform-managed, version-controlled deployment
 
-## 2.3. Scope
+## 2.4. Scope
 
 ### In Scope
 
@@ -155,7 +165,7 @@ This RFC proposes the implementation of **GCP Dataplex Universal Catalog** as a 
 - Data ingestion or ETL pipelines (use Dataflow, Cloud Data Fusion)
 - Network configuration (Dataplex is a serverless service)
 
-## 2.4. Key Terms & Definitions
+## 2.5. Key Terms & Definitions
 
 | Term | Simple Explanation | Example |
 |------|-------------------|---------|
