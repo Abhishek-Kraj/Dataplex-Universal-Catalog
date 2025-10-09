@@ -52,18 +52,14 @@
 
 # 1. Executive Summary
 
-## 1.1. Purpose
-
-This RFC proposes the implementation of **GCP Dataplex Universal Catalog** as a Terraform module integrated with ISS (Infrastructure Self-Service) Foundation. The module provides data cataloging, governance, and quality monitoring capabilities for GCS buckets and BigQuery datasets.
-
-## 1.2. Key Objectives
+## 1.1. Key Objectives
 
 - **Simplify Data Cataloging**: Automate metadata discovery and indexing for all data assets
 - **Enable Data Governance**: Implement quality monitoring, profiling, and business glossaries
 - **ISS Foundation Integration**: Seamless integration with existing ISS infrastructure patterns
 - **Infrastructure as Code**: 100% Terraform-managed, version-controlled deployment
 
-## 1.3. Business Value
+## 1.2. Business Value
 
 | Benefit | Impact | Stakeholder |
 |---------|--------|-------------|
@@ -72,7 +68,7 @@ This RFC proposes the implementation of **GCP Dataplex Universal Catalog** as a 
 | **Compliance & Audit** | Complete audit trail, metadata for regulatory compliance | Compliance Officers, Auditors |
 | **Reduced Operational Overhead** | Serverless, fully-managed (no infrastructure to maintain) | Platform Team, SRE |
 
-## 1.4. Solution Overview
+## 1.3. Solution Overview
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -106,9 +102,11 @@ This RFC proposes the implementation of **GCP Dataplex Universal Catalog** as a 
 
 ## 2.1. Document Purpose
 
+This RFC proposes the implementation of **GCP Dataplex Universal Catalog** as a Terraform module integrated with ISS (Infrastructure Self-Service) Foundation. The module provides data cataloging, governance, and quality monitoring capabilities for GCS buckets and BigQuery datasets.
+
 | Field | Description |
 |-------|-------------|
-| **Purpose** | To describe deployment process of GCP Dataplex Universal Catalog resources through infrastructure as code (IaC) using the Terraform Resources from the Google Cloud provider. |
+| **Purpose** | To describe deployment process of GCP Dataplex Universal Catalog resources through infrastructure as code (IaC) using Terraform Resources from the Google Cloud provider. |
 | **Intended Audience** | Security team, Cloud architects, DevOps engineers with familiarity of data governance, security controls, IAM, and Terraform on Google Cloud. |
 | **Key Assumptions** | The audience should have understanding of data governance, GCP security model, Terraform IaC, and enterprise compliance requirements. |
 
