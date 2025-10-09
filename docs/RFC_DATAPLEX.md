@@ -147,7 +147,6 @@ This RFC proposes the implementation of **GCP Dataplex Universal Catalog** as a 
 - Business glossaries (terms and definitions)
 - Metadata catalog (entry groups, entry types, aspect types)
 - Integration with ISS Foundation (`builtin_gcs_v2.tf`, `builtin_bigquery.tf`)
-- Integration with Datastream (catalog CDC-replicated datasets)
 
 ### Out of Scope ❌
 
@@ -156,7 +155,7 @@ This RFC proposes the implementation of **GCP Dataplex Universal Catalog** as a 
 - Managing encryption keys (ISS Foundation handles org-wide CMEK)
 - Creating custom service accounts (uses Google-managed SA)
 - Spark/Dataproc tasks (`enable_process = false`)
-- Data ingestion or ETL pipelines (use Datastream, Dataflow)
+- Data ingestion or ETL pipelines (use Dataflow, Cloud Data Fusion)
 - Network configuration (Dataplex is serverless)
 
 ## 2.4. Key Terms & Definitions
@@ -421,68 +420,6 @@ glossaries = [{
 - 📖 **Single source of truth** for business terms
 - 🤝 **Consistent** understanding across teams
 - 🔍 **Searchable** via Data Catalog
-
----
-
-### Use Case 4: Integration with Datastream CDC Pipeline
-
-**Scenario**: Data replicated from Cloud SQL (PostgreSQL) to BigQuery using Datastream. Need to catalog and govern the replicated data.
-
-**Architecture**:
-
-```
-┌─────────────┐   CDC    ┌─────────────┐  Catalog  ┌─────────────┐
-│  Cloud SQL  │ ──────▶  │ Datastream  │ ────────▶ │  BigQuery   │
-│ (PostgreSQL)│          │ Replication │           │  Dataset    │
-└─────────────┘          └─────────────┘           └──────┬──────┘
-     Source                                                │
-                                                           │
-                                                   ┌───────▼──────┐
-                                                   │   Dataplex   │
-                                                   │   Catalog    │
-                                                   │              │
-                                                   │ • Quality    │
-                                                   │ • Glossary   │
-                                                   │ • Search     │
-                                                   └──────────────┘
-```
-
-**Configuration**:
-
-```hcl
-# Step 1: Datastream replicates data (separate module)
-# Cloud SQL → BigQuery dataset: customer_data
-
-# Step 2: Dataplex catalogs the dataset
-dataplex_lakes = {
-  "customer-catalog" : {
-    lakes = [{
-      lake_id = "customer-lake"
-      zones = [{
-        zone_id          = "customer-data-curated"
-        type             = "CURATED"
-        existing_dataset = "customer_data"  # Created by Datastream
-      }]
-    }]
-
-    # Step 3: Validate replicated data quality
-    quality_scans = [{
-      scan_id     = "customer-cdc-quality"
-      data_source = "//bigquery.googleapis.com/projects/PROJECT/datasets/customer_data/tables/customers"
-      rules = [
-        { rule_type = "NON_NULL", column = "customer_id", threshold = 1.0 },
-        { rule_type = "UNIQUENESS", column = "customer_id", threshold = 1.0 }
-      ]
-      schedule = "0 */4 * * *"  # Every 4 hours (more frequent for CDC data)
-    }]
-  }
-}
-```
-
-**Benefits**:
-- 🔄 **End-to-end pipeline**: Source → CDC → Catalog → Governance
-- ✅ **Validate replicated data** quality automatically
-- 📊 **Monitor CDC lag** and data freshness
 
 ---
 
@@ -890,9 +827,9 @@ dataplex_lakes = {
 
 **Example Lineage Flow**:
 ```
-Cloud SQL (PostgreSQL)
+GCS Raw Data (CSV/JSON)
     │
-    │ (Datastream CDC)
+    │ (Dataflow ETL)
     ▼
 BigQuery Raw Dataset
     │
@@ -1567,7 +1504,6 @@ Terraform Dependency:
 ISS Foundation Level 3 (Runtime)
 ├── builtin_gcs_v2.tf         ← Creates GCS buckets (with CMEK)
 ├── builtin_bigquery.tf       ← Creates BigQuery datasets (with CMEK)
-├── builtin_datastream.tf     ← Creates Datastream resources (CDC)
 └── builtin_dataplex.tf       ← NEW: Catalogs all resources above
 ```
 
@@ -1577,7 +1513,6 @@ ISS Foundation Level 3 (Runtime)
 |--------|---------------|---------|
 | `builtin_gcs_v2.tf` | Storage infrastructure | GCS buckets (encrypted) |
 | `builtin_bigquery.tf` | Data warehouse infrastructure | BigQuery datasets (encrypted) |
-| `builtin_datastream.tf` | CDC replication | Datastream connections, streams |
 | `builtin_dataplex.tf` | **Data cataloging & governance** | **Dataplex lakes, zones, assets** |
 
 ---
@@ -2935,18 +2870,7 @@ See [Cost Analysis](#9-cost-analysis) for detailed examples.
 
 ---
 
-### Q7: Can I use Dataplex with Datastream?
-
-**A**: Yes! Dataplex integrates seamlessly with Datastream:
-1. Datastream replicates data from Cloud SQL → BigQuery
-2. Dataplex catalogs the BigQuery dataset created by Datastream
-3. Dataplex runs quality scans on the replicated data
-
-See [Use Case 4: Integration with Datastream](#use-case-4-integration-with-datastream-cdc-pipeline).
-
----
-
-### Q8: What happens if I delete a Dataplex resource?
+### Q7: What happens if I delete a Dataplex resource?
 
 **A**: Deleting Dataplex resources (lakes, zones, assets, scans) does **NOT** affect underlying data:
 - GCS buckets remain intact
@@ -2957,7 +2881,7 @@ You can recreate the catalog anytime by redeploying via Terraform.
 
 ---
 
-### Q9: How do I rollback a deployment?
+### Q8: How do I rollback a deployment?
 
 **A**:
 ```bash
@@ -2974,7 +2898,7 @@ See [Rollback Plan](#73-rollback-plan) for details.
 
 ---
 
-### Q10: Do I need to create custom service accounts?
+### Q9: Do I need to create custom service accounts?
 
 **A**: No. The module uses the **Google-managed Dataplex service account** (`service-{PROJECT_NUMBER}@gcp-sa-dataplex.iam.gserviceaccount.com`), which is created automatically when you enable the Dataplex API. No custom service accounts are needed.
 
